@@ -1,7 +1,7 @@
 version: '2.2'
 services:
   jupyterlab:
-    image: tristan0x/jupyterlab-neuron
+    image: cnsoist/steps-testing/
     build: recipe
     network_mode: host
     environment:
