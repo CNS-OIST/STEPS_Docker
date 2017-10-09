@@ -11,14 +11,17 @@ You must have:
 
 ## Basic Usage
 
-Use `docker-compose` to start the container:
-
 ```bash
+$ git clone https://github.com/tristan0x/jupyterlab-steps.git
+$ cd jupyterlab-steps
+$ git checkout 3.1
+$ mkdir notebooks
 $ export DUID=`id -u`
 $ export DGID=`id -g`
 $ export HOST=`hostname`
-$ docker-compose up steps
-Creating jupyterlabsteps_steps_1 ... 
+$ docker-compose up
+
+Creating jupyterlabsteps_steps_1 ...
 Creating jupyterlabsteps_steps_1 ... done
 Attaching to jupyterlabsteps_steps_1
 steps_1  | [I 13:17:27.701 LabApp] Writing notebook server cookie secret to /home/dummy/.local/share/jupyter/runtime/notebook_cookie_secret
