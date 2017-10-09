@@ -48,7 +48,9 @@ RUN echo 'export PATH=/opt/conda/bin:$PATH' > /etc/profile.d/conda.sh \
 
 ENV PATH "/opt/conda/bin:$PATH"
 
-RUN git clone -b maint https://bitbucket.org/petsc/petsc /var/src/petsc \
+ARG BUILD_PETSC=false
+RUN if [ "x$BUILD_PETSC" = xtrue ] ; then ( \
+    git clone -b maint https://bitbucket.org/petsc/petsc /var/src/petsc \
  && cd /var/src/petsc \
  && ./configure \
      --prefix=/usr \
@@ -61,7 +63,8 @@ RUN git clone -b maint https://bitbucket.org/petsc/petsc /var/src/petsc \
  && cd /var/src/petsc ; make \
  && make install \
  && rm -rf /var/src/petsc \
- && ldconfig
+ && ldconfig \
+ ) fi
 
 ARG STEPS_VERSION=5fe7b245554ab5b23798323f7c8d819a94069c63
 RUN git clone --recursive https://github.com/CNS-OIST/STEPS.git /var/src/STEPS \
