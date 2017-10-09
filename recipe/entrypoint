@@ -47,6 +47,7 @@ fi
 # the fake user otherwise.
 case "$1" in
     sh|bash)
+        cd /opt/src/notebooks
         exec $@
         ;;
     *)
