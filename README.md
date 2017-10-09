@@ -1,13 +1,14 @@
 # JupyterLab / STEPS
 
-This repository provides the Docker recipe to build an image providing
-a JupyterLab environment with [STEPS](http://steps.sourceforge.net).
+This repository provides both the Docker recipe and runtime configuration
+of the official CNS-OIST STEPS Docker image.
 
 ## Requirements
 
 You must have:
 * Docker installed and running.
 * [Docker Compose](https://docs.docker.com/compose) utility installed.
+* Git
 
 ## Basic Usage
 
