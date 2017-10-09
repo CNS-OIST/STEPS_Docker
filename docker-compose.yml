@@ -1,7 +1,7 @@
 version: '2.2'
 services:
   jupyterlab:
-    image: cnsoist/steps-testing
+    image: cnsoist/steps-testing:3.1
     build: recipe
     network_mode: host
     environment:
