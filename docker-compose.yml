@@ -11,5 +11,4 @@ services:
     - USER_ID=$DUID
     - GROUP_ID=$DGID
     volumes:
-    - $SSH_AUTH_SOCK:/ssh_agent
     - $PWD/notebooks:/opt/src/notebooks
