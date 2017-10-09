@@ -20,9 +20,7 @@ $ git clone https://github.com/CNS-OIST/STEPS_Docker
 $ cd jupyterlab-steps
 $ git checkout 3.1
 $ mkdir notebooks
-$ export DUID=`id -u`
-$ export DGID=`id -g`
-$ export HOST=`hostname`
+$ export DUID=`id -u` DGID=`id -g` HOST=`hostname`
 $ docker-compose up
 
 Creating jupyterlabsteps_steps_1 ...
