@@ -3,6 +3,7 @@ services:
   jupyterlab:
     image: cnsoist/steps-testing:3.1
     build: recipe
+    hostname: $HOSTNAME
     ports:
     - "8888:8888"
     environment:
