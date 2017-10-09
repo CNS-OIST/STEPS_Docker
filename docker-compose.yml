@@ -1,6 +1,6 @@
 version: '2.2'
 services:
-  jupyterlab:
+  steps:
     image: cnsoist/steps-testing:3.1
     build: recipe
     hostname: $HOST

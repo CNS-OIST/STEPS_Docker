@@ -9,6 +9,7 @@ RUN apt-get update \
     git \
     libmpich-dev \
     libopenblas-dev \
+    liblapack-dev \
     pandoc \
     wget
 
@@ -49,7 +50,14 @@ ENV PATH "/opt/conda/bin:$PATH"
 
 RUN git clone -b maint https://bitbucket.org/petsc/petsc /var/src/petsc \
  && cd /var/src/petsc \
- && ./configure --prefix=/usr \
+ && ./configure \
+     --prefix=/usr \
+     --with-fc=0 \
+     --with-blas-lib=/usr/lib/libblas.so \
+     --with-mpi-dir=/usr/lib/mpich \
+     --with-lapack-lib=/usr/lib/lapack/liblapack.so \
+     --with-64-bit-indices \
+     --with-debugging=0 \
  && cd /var/src/petsc ; make \
  && make install \
  && rm -rf /var/src/petsc \

@@ -8,13 +8,18 @@
 # https://stackoverflow.com/questions/41857462
 
 if [ "x$GROUP_ID" = x -o "x$USER_ID" = x ] ;then
-    echo 'Error: $USERID and $GROUP_ID environment variable not set' >&2
+    echo 'Error: $USER_ID and $GROUP_ID environment variable not set' >&2
     echo Abort >&2
     exit 1
 fi
 
 # Create fake user
-grep -q ^dummy: /etc/group || groupadd -g $GROUP_ID dummy
+CUR_GROUP=`grep ":$GROUP_ID:" | cut -d: -f1`
+if [ "x$CUR_GROUP" != x ] ;then
+    groupmod --new-name dummy "$CUR_GROUP"
+else
+    grep -q ^dummy: /etc/group || groupadd -g $GROUP_ID dummy
+fi
 grep -q ^dummy: /etc/passwd || useradd -u $USER_ID -g $GROUP_ID dummy
 
 mkdir -p /home/dummy/.ssh
