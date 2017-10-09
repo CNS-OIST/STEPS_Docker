@@ -6,14 +6,17 @@ of the official CNS-OIST STEPS Docker image.
 ## Requirements
 
 You must have:
-* Docker installed and running.
+* [Docker](https://www.docker.com/community-edition) installed and running.
 * [Docker Compose](https://docs.docker.com/compose) utility installed.
-* Git
+* [Git](https://git-scm.com/)
 
-## Basic Usage
+## Getting Started
+
+The set of commands below will start a JupyterLab container providing
+STEPS Python module.
 
 ```bash
-$ git clone https://github.com/tristan0x/jupyterlab-steps.git
+$ git clone https://github.com/CNS-OIST/STEPS_Docker
 $ cd jupyterlab-steps
 $ git checkout 3.1
 $ mkdir notebooks
@@ -44,7 +47,10 @@ steps_1  |         http://0.0.0.0:8888/?token=090902d4e339471a4a9b4aa51c6236b68a
 ```
 
 Then open your web browser at the provided HTTP address. In this case
-http://localhost:8888/?token=fbf49d09731a046e874888ca5baf40f453e171660d0fd01f
+http://0.0.0.0:8888/?token=090902d4e339471a4a9b4aa51c6236b68a6f0787b23c6c50
+
+Inside the JupyterLab files browser, you will be able to see `STEPS_Example` directory
+providing code samples to start with.
 
 ## Advanced Usage
 
@@ -65,5 +71,5 @@ See official documentation [here](https://docs.docker.com/docker-for-mac/#memory
 
 ## License
 
-This project is licensed under the GPL v2. See the [LICENSE](./LICENSE) file
-for more details.
+CNS-OIST STEPS is released under the terms of the GNU General Public License version 2
+See the [LICENSE](./LICENSE) file for more details.
