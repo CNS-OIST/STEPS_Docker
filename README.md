@@ -69,10 +69,12 @@ $ docker-compose run steps COMMAND
 
 `COMMAND` can be anything like `bash` or `ipython`.
 
-### Run huge simulation on OSX
+### Run huge simulations on OSX
 
-On OSX, you may have to increase the memory allocated to the Docker containers.
+On OSX, you may have to increase the memory allocated to the Docker containers
+to execute important simulations. Default reserved memory in 2GB.
 See official documentation [here](https://docs.docker.com/docker-for-mac/#memory)
+to increase it.
 
 ## License
 
