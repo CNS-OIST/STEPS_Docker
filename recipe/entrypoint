@@ -14,13 +14,13 @@ if [ "x$GROUP_ID" = x -o "x$USER_ID" = x ] ;then
 fi
 
 # Create fake user
-CUR_GROUP=`grep ":$GROUP_ID:" | cut -d: -f1`
+CUR_GROUP=`grep ":${GROUP_ID}:" /etc/group | cut -d: -f1`
 if [ "x$CUR_GROUP" != x ] ;then
     groupmod --new-name dummy "$CUR_GROUP"
 else
     grep -q ^dummy: /etc/group || groupadd -g $GROUP_ID dummy
 fi
-grep -q ^dummy: /etc/passwd || useradd -u $USER_ID -g $GROUP_ID dummy
+grep -q ^dummy: /etc/passwd || useradd -u $USER_ID -g $GROUP_ID dummy -s /bin/bash
 
 mkdir -p /home/dummy/.ssh
 # Setup SSH configuration
