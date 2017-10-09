@@ -21,7 +21,7 @@ $ cd jupyterlab-steps
 $ git checkout 3.1
 $ mkdir notebooks
 $ export DUID=`id -u` DGID=`id -g` HOST=`hostname`
-$ docker-compose up
+$ docker-compose up lab
 
 Creating jupyterlabsteps_steps_1 ...
 Creating jupyterlabsteps_steps_1 ... done
@@ -73,6 +73,24 @@ On OSX, you may have to increase the memory allocated to the Docker containers
 to execute important simulations. Default reserved memory in 2GB.
 See official documentation [here](https://docs.docker.com/docker-for-mac/#memory)
 to increase it.
+
+### How to use traditional Jupyter Notebook
+
+Jupyter Notebook is very lazy when it comes to the syntax of ipynb files compared
+to JupyterLab. In JupyterLab, notebooks must be valid JSON files. This may prevent
+you to import your notebooks. In this case, you can either
+
+* Fix JSON issues in your existing notebooks. To detect syntax errors, you can
+  use the command below:
+
+    ```bash
+    <YOUR_NOTEBOOK.ipynb python -m json.tool
+    ```
+* Use the `notebook` container provided in the `docker-compose.yml` file:
+
+    ```bash
+    docker-compose up notebook
+    ```
 
 ## License
 

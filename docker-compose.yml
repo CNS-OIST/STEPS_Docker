@@ -1,6 +1,6 @@
 version: '2.2'
 services:
-  steps:
+  lab:
     image: cnsoist/steps:3.1
     build: recipe
     hostname: $HOST
@@ -12,3 +12,12 @@ services:
     - GROUP_ID=$DGID
     volumes:
     - $PWD/notebooks:/opt/src/notebooks
+  notebook:
+    extends: lab
+    command:
+        - jupyter
+        - notebook
+        - --notebook-dir=/opt/src/notebooks
+        - --ip=0.0.0.0
+        - --no-browser
+        - --allow-root

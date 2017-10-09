@@ -44,7 +44,11 @@ RUN echo 'export PATH=/opt/conda/bin:$PATH' > /etc/profile.d/conda.sh \
  && wget --quiet https://repo.continuum.io/miniconda/Miniconda${MINICONDA_VERSION}-Linux-x86_64.sh -O ~/miniconda.sh \
  && /bin/bash ~/miniconda.sh -b -p /opt/conda \
  && rm ~/miniconda.sh \
- && /opt/conda/bin/pip install jupyterlab matplotlib cython
+ && /opt/conda/bin/pip install \
+    cython \
+    jupyter \
+    jupyterlab \
+    matplotlib
 
 ENV PATH "/opt/conda/bin:$PATH"
 
