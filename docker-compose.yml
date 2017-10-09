@@ -7,10 +7,9 @@ services:
     ports:
     - "8888:8888"
     environment:
-    - SSH_AUTH_SOCK=/ssh_agent
     - USER_LOGIN=$USER
-    - USER_ID=$UID
-    - GROUP_ID=$GID
+    - USER_ID=$DUID
+    - GROUP_ID=$DGID
     volumes:
     - $SSH_AUTH_SOCK:/ssh_agent
     - $PWD/notebooks:/opt/src/notebooks
