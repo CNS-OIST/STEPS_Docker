@@ -1,4 +1,4 @@
-# JupyterLab / STEPS
+# CNS-OIST STEPS Docker Image
 
 This repository provides both the Docker recipe and runtime configuration
 of the official CNS-OIST STEPS Docker image.
