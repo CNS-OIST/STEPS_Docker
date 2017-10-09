@@ -48,7 +48,7 @@ RUN echo 'export PATH=/opt/conda/bin:$PATH' > /etc/profile.d/conda.sh \
 
 ENV PATH "/opt/conda/bin:$PATH"
 
-ARG BUILD_PETSC=false
+ARG BUILD_PETSC=true
 RUN if [ "x$BUILD_PETSC" = xtrue ] ; then ( \
     git clone -b maint https://bitbucket.org/petsc/petsc /var/src/petsc \
  && cd /var/src/petsc \
@@ -82,6 +82,7 @@ RUN git clone https://github.com/CNS-OIST/STEPS_Example.git /var/src/STEPS_Examp
  && rm -rf /var/src/STEPS_Example
 
 ENV LANG en_US.utf8
+ENV SHELL=/bin/bash
 
 ADD entrypoint /usr/bin/
 ENTRYPOINT ["/usr/bin/entrypoint"]
