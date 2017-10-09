@@ -35,6 +35,7 @@ done
 EXAMPLE_DIR=/opt/src/notebooks/STEPS_Example
 if ! [ -d "$EXAMPLE_DIR" ] ;then
     cp -r /var/src/manual_tutorials "$EXAMPLE_DIR"
+    chown -R dummy:dummy "$EXAMPLE_DIR"
 fi
 
 # Run the given command as root if bash or sh,

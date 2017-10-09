@@ -79,5 +79,6 @@ CMD [ \
     "jupyter", "lab", \
     "--no-browser", "--allow-root", \
     "--ip=0.0.0.0", \
+    "--app-dir=/opt/src/notebooks", \
     "--notebook-dir=/opt/src/notebooks" \
 ]
