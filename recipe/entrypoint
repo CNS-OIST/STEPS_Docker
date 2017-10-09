@@ -32,6 +32,11 @@ for path in /.jupyter /.local /opt/src ; do
     chmod +t "$path"
 done
 
+EXAMPLE_DIR=/opt/src/notebooks/STEPS_Example
+if ! [ -d "$EXAMPLE_DIR" ] ;then
+    cp -r /var/src/manual_tutorials "$EXAMPLE_DIR"
+fi
+
 # Run the given command as root if bash or sh,
 # the fake user otherwise.
 case "$1" in

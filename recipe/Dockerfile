@@ -1,50 +1,41 @@
-FROM fedora:25
+FROM ubuntu:16.04
 MAINTAINER Tristan CAREL <tristan.carel@epfl.ch>
 
-RUN echo 'check-update' \
- ;  dnf check-update -yv \
- ;  echo 'distro-sync' \
- ;  dnf distro-sync -yv \
- ;  echo 'install C Dev Tools' \
- ;  dnf group install -yv 'C Development Tools and Libraries' \
- && echo 'install Dev tools' \
- && dnf group install -yv 'Development Tools' \
- && dnf install -y \
+RUN apt-get update \
+ && apt-get install -y \
     bzip2 \
-    bzip2-devel \
     cmake \
-    fftw-devel \
-    fftw-libs \
     graphviz \
-    hdf5 \
-    hdf5-devel \
-    hostname \
-    libgomp \
-    libSM \
-    libXext \
-    libXrender \
-    ncurses \
-    ncurses-devel \
-    ncurses-libs \
+    git \
+    libmpich-dev \
+    libopenblas-dev \
     pandoc \
-    readline \
-    readline-devel \
     wget
 
 ENV GOSU_VERSION 1.10
 RUN set -ex; \
-    dnf -y install dpkg gnupg; \
+    \
+    fetchDeps=' \
+        ca-certificates \
+        wget \
+    '; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends $fetchDeps; \
+    rm -rf /var/lib/apt/lists/*; \
+    \
     dpkgArch="$(dpkg --print-architecture | awk -F- '{ print $NF }')"; \
-    wget -O /usr/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$dpkgArch"; \
-    wget -O /tmp/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$dpkgArch.asc"; \
+    wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$dpkgArch"; \
+    wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$dpkgArch.asc"; \
+    \
+# verify the signature
     export GNUPGHOME="$(mktemp -d)"; \
     gpg --keyserver ha.pool.sks-keyservers.net --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4; \
-    gpg --batch --verify /tmp/gosu.asc /usr/bin/gosu; \
-    rm -r "$GNUPGHOME" /tmp/gosu.asc; \
-    chmod +x /usr/bin/gosu; \
-    gosu nobody true; \
-    dnf -y remove dpkg gnupg; \
-    dnf clean all
+    gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu; \
+    rm -r "$GNUPGHOME" /usr/local/bin/gosu.asc; \
+    \
+    chmod +x /usr/local/bin/gosu; \
+# verify that the binary works
+    gosu nobody true
 
 ARG MINICONDA_VERSION=2-4.3.21
 
@@ -52,21 +43,17 @@ RUN echo 'export PATH=/opt/conda/bin:$PATH' > /etc/profile.d/conda.sh \
  && wget --quiet https://repo.continuum.io/miniconda/Miniconda${MINICONDA_VERSION}-Linux-x86_64.sh -O ~/miniconda.sh \
  && /bin/bash ~/miniconda.sh -b -p /opt/conda \
  && rm ~/miniconda.sh \
- && /opt/conda/bin/pip install jupyterlab matplotlib
+ && /opt/conda/bin/pip install jupyterlab matplotlib cython
 
 ENV PATH "/opt/conda/bin:$PATH"
 
-RUN dnf install -y openblas-devel
-RUn /opt/conda/bin/pip install cython
-RUN dnf install -y mpich-devel
-
 RUN git clone -b maint https://bitbucket.org/petsc/petsc /var/src/petsc \
  && cd /var/src/petsc \
- && ./configure --prefix=/usr/local \
+ && ./configure --prefix=/usr \
  && cd /var/src/petsc ; make \
  && make install \
- && rm -rf /var/src/petsc
-
+ && rm -rf /var/src/petsc \
+ && ldconfig
 
 ARG STEPS_VERSION=5fe7b245554ab5b23798323f7c8d819a94069c63
 RUN git clone --recursive https://github.com/CNS-OIST/STEPS.git /var/src/STEPS \
@@ -79,7 +66,9 @@ RUN git clone --recursive https://github.com/CNS-OIST/STEPS.git /var/src/STEPS \
  && make install \
  && rm -rf /var/src/STEPS
 
-RUN git clone git@github.com:tristan0x/STEPS_Validation.git /var/src/
+RUN git clone https://github.com/CNS-OIST/STEPS_Example.git /var/src/STEPS_Example \
+ && mv /var/src/STEPS_Example/manual_tutorials /var/src/manual_tutorials \
+ && rm -rf /var/src/STEPS_Example
 
 ENV LANG en_US.utf8
 
@@ -89,5 +78,6 @@ ENTRYPOINT ["/usr/bin/entrypoint"]
 CMD [ \
     "jupyter", "lab", \
     "--no-browser", "--allow-root", \
+    "--ip=0.0.0.0", \
     "--notebook-dir=/opt/src/notebooks" \
 ]

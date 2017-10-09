@@ -3,7 +3,8 @@ services:
   jupyterlab:
     image: cnsoist/steps-testing:3.1
     build: recipe
-    network_mode: host
+    ports:
+    - "8888:8888"
     environment:
     - SSH_AUTH_SOCK=/ssh_agent
     - USER_LOGIN=$USER

@@ -69,8 +69,8 @@ You can register additional SSH keys to the agent with the `ssh-add /path/to/pri
 Now you can use `docker-compose` to start the container:
 
 ```bash
-export UID GID
-docker-compose up jupyterlab
+$ export UID GID
+$ docker-compose up jupyterlab
 Recreating bbpjupyterlab_jupyterlab_1 ...
 Recreating bbpjupyterlab_jupyterlab_1 ... done
 Attaching to bbpjupyterlab_jupyterlab_1
