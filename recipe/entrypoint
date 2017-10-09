@@ -1,4 +1,4 @@
-#!/bin/sh -e
+#!/bin/sh
 
 # Create fake user and group with the same ids than
 # the host user, and use its identity all along
