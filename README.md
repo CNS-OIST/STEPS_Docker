@@ -49,8 +49,13 @@ steps_1  |         http://0.0.0.0:8888/?token=090902d4e339471a4a9b4aa51c6236b68a
 Then open your web browser at the provided HTTP address. In this case
 http://0.0.0.0:8888/?token=090902d4e339471a4a9b4aa51c6236b68a6f0787b23c6c50
 
+## Files management
+
 Inside the JupyterLab files browser, you will be able to see `STEPS_Example` directory
 providing code samples to start with.
+
+You are free to modify the `notebooks` directory from either the container or
+your machine. Files created on one side will be visible on the other one, and vice versa!
 
 ## Advanced Usage
 
