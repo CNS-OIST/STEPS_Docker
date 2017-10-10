@@ -17,35 +17,35 @@ STEPS Python module.
 
 ```bash
 $ git clone https://github.com/CNS-OIST/STEPS_Docker
-$ cd jupyterlab-steps
+$ cd STEPS_Docker
 $ git checkout 3.1
-$ mkdir notebooks
 $ export DUID=`id -u` DGID=`id -g` HOST=`hostname`
 $ docker-compose up lab
+Creating network "stepsdocker_default" with the default driver
+Creating stepsdocker_lab_1 ...
+Creating stepsdocker_lab_1 ... done
+Attaching to stepsdocker_lab_1
+lab_1       | [I 11:11:08.510 LabApp] Writing notebook server cookie secret to /home/dummy/.local/share/jupyter/runtime/notebook_cookie_secret
+lab_1       | [W 11:11:08.526 LabApp] JupyterLab server extension not enabled, manually loading...
+lab_1       | [I 11:11:08.526 LabApp] JupyterLab alpha preview extension loaded from /opt/conda/lib/python2.7/site-packages/jupyterlab
+lab_1       | JupyterLab v0.27.0
+lab_1       | Known labextensions:
+lab_1       | [I 11:11:08.527 LabApp] Running the core application with no additional extensions or settings
+lab_1       | [I 11:11:08.528 LabApp] Serving notebooks from local directory: /opt/src/notebooks
+lab_1       | [I 11:11:08.528 LabApp] 0 active kernels
+lab_1       | [I 11:11:08.528 LabApp] The Jupyter Notebook is running at:
+lab_1       | [I 11:11:08.528 LabApp] http://0.0.0.0:8888/?token=1ad5c8449f01f463bb9f716663e14f38cc133517c097ff9b
+lab_1       | [I 11:11:08.528 LabApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
+lab_1       | [C 11:11:08.529 LabApp]
+lab_1       |
+lab_1       |     Copy/paste this URL into your browser when you connect for the first time,
+lab_1       |     to login with a token:
+lab_1       |         http://0.0.0.0:8888/?token=1ad5c8449f01f463bb9f716663e14f38cc133517c097ff9b
 
-Creating jupyterlabsteps_steps_1 ...
-Creating jupyterlabsteps_steps_1 ... done
-Attaching to jupyterlabsteps_steps_1
-steps_1  | [I 13:17:27.701 LabApp] Writing notebook server cookie secret to /home/dummy/.local/share/jupyter/runtime/notebook_cookie_secret
-steps_1  | [W 13:17:27.717 LabApp] JupyterLab server extension not enabled, manually loading...
-steps_1  | [I 13:17:27.717 LabApp] JupyterLab alpha preview extension loaded from /opt/conda/lib/python2.7/site-packages/jupyterlab
-steps_1  | JupyterLab v0.27.0
-steps_1  | Known labextensions:
-steps_1  | [I 13:17:27.718 LabApp] Running the core application with no additional extensions or settings
-steps_1  | [I 13:17:27.719 LabApp] Serving notebooks from local directory: /opt/src/notebooks
-steps_1  | [I 13:17:27.719 LabApp] 0 active kernels
-steps_1  | [I 13:17:27.719 LabApp] The Jupyter Notebook is running at:
-steps_1  | [I 13:17:27.719 LabApp] http://0.0.0.0:8888/?token=090902d4e339471a4a9b4aa51c6236b68a6f0787b23c6c50
-steps_1  | [I 13:17:27.719 LabApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
-steps_1  | [C 13:17:27.719 LabApp]
-steps_1  |
-steps_1  |     Copy/paste this URL into your browser when you connect for the first time,
-steps_1  |     to login with a token:
-steps_1  |         http://0.0.0.0:8888/?token=090902d4e339471a4a9b4aa51c6236b68a6f0787b23c6c50
 ```
 
 Then open your web browser at the provided HTTP address. In this case
-http://0.0.0.0:8888/?token=090902d4e339471a4a9b4aa51c6236b68a6f0787b23c6c50
+http://0.0.0.0:8888/?token=1ad5c8449f01f463bb9f716663e14f38cc133517c097ff9b
 
 ## Files management
 
