@@ -77,7 +77,7 @@ RUN git clone --recursive https://github.com/CNS-OIST/STEPS.git /var/src/STEPS \
  && mkdir build \
  && cd build \
  && cmake .. \
- && make -j \
+ && make \
  && make install \
  && rm -rf /var/src/STEPS
 
