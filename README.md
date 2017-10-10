@@ -78,7 +78,7 @@ to increase it.
 
 Jupyter Notebook is very lazy when it comes to the syntax of ipynb files compared
 to JupyterLab. In JupyterLab, notebooks must be valid JSON files. This may prevent
-you to import your notebooks. In this case, you can either
+you to import your notebooks. In this case, you can either:
 
 * Fix JSON issues in your existing notebooks. To detect syntax errors, you can
   use the command below:

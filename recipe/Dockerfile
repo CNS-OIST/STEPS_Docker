@@ -64,7 +64,7 @@ RUN if [ "x$BUILD_PETSC" = xtrue ] ; then ( \
      --with-lapack-lib=/usr/lib/lapack/liblapack.so \
      --with-64-bit-indices \
      --with-debugging=0 \
- && cd /var/src/petsc ; make \
+ && cd /var/src/petsc ; make MAKE_NP=1 \
  && make install \
  && rm -rf /var/src/petsc \
  && ldconfig \
