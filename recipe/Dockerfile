@@ -10,6 +10,7 @@ RUN apt-get update \
     libmpich-dev \
     libopenblas-dev \
     pandoc \
+    python \
     wget
 
 ENV GOSU_VERSION 1.10
@@ -37,7 +38,7 @@ RUN set -ex; \
 # verify that the binary works
     gosu nobody true
 
-ARG MINICONDA_VERSION=2-4.3.21
+ARG MINICONDA_VERSION=3-4.3.21
 
 RUN echo 'export PATH=/opt/conda/bin:$PATH' > /etc/profile.d/conda.sh \
  && wget --quiet https://repo.continuum.io/miniconda/Miniconda${MINICONDA_VERSION}-Linux-x86_64.sh -O ~/miniconda.sh \
@@ -55,7 +56,7 @@ ARG BUILD_PETSC=true
 RUN if [ "x$BUILD_PETSC" = xtrue ] ; then ( \
     git clone -b maint https://bitbucket.org/petsc/petsc /var/src/petsc \
  && cd /var/src/petsc \
- && ./configure \
+ && /usr/bin/python2 ./configure \
      --prefix=/usr \
      --with-fc=0 \
      --with-blas-lib=/usr/lib/libopenblas.so \
@@ -69,7 +70,7 @@ RUN if [ "x$BUILD_PETSC" = xtrue ] ; then ( \
  && ldconfig \
  ) fi
 
-ARG STEPS_VERSION=5fe7b245554ab5b23798323f7c8d819a94069c63
+ARG STEPS_VERSION=3.2.0
 RUN git clone --recursive https://github.com/CNS-OIST/STEPS.git /var/src/STEPS \
  && cd /var/src/STEPS \
  && git checkout "$STEPS_VERSION" \
@@ -81,7 +82,7 @@ RUN git clone --recursive https://github.com/CNS-OIST/STEPS.git /var/src/STEPS \
  && rm -rf /var/src/STEPS
 
 RUN git clone https://github.com/CNS-OIST/STEPS_Example.git /var/src/STEPS_Example \
- && mv /var/src/STEPS_Example/manual_tutorials /var/src/manual_tutorials \
+ && mv /var/src/STEPS_Example/user_manual/source /var/src/user_manual \
  && rm -rf /var/src/STEPS_Example
 
 ENV LANG en_US.utf8
@@ -94,6 +95,5 @@ CMD [ \
     "jupyter", "lab", \
     "--no-browser", "--allow-root", \
     "--ip=0.0.0.0", \
-    "--app-dir=/opt/src/notebooks", \
     "--notebook-dir=/opt/src/notebooks" \
 ]
