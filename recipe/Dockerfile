@@ -9,7 +9,6 @@ RUN apt-get update \
     git \
     libmpich-dev \
     libopenblas-dev \
-    liblapack-dev \
     pandoc \
     wget
 
@@ -59,9 +58,9 @@ RUN if [ "x$BUILD_PETSC" = xtrue ] ; then ( \
  && ./configure \
      --prefix=/usr \
      --with-fc=0 \
-     --with-blas-lib=/usr/lib/libblas.so \
+     --with-blas-lib=/usr/lib/libopenblas.so \
      --with-mpi-dir=/usr/lib/mpich \
-     --with-lapack-lib=/usr/lib/lapack/liblapack.so \
+     --with-lapack-lib=/usr/lib/libopenblas.so \
      --with-64-bit-indices \
      --with-debugging=0 \
  && cd /var/src/petsc ; make MAKE_NP=1 \
