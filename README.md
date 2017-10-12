@@ -18,6 +18,7 @@ STEPS Python module.
 ```bash
 $ git clone https://github.com/CNS-OIST/STEPS_Docker
 $ cd STEPS_Docker
+$ git checkout 3.1
 $ export DUID=`id -u` DGID=`id -g` HOST=`hostname`
 $ docker-compose up lab
 Creating network "stepsdocker_default" with the default driver
