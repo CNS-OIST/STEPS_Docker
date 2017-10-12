@@ -56,9 +56,9 @@ your machine. Files created on one side will be visible on the other one, and vi
 
 ## Advanced Usage
 
-### Use another version of STEPS
+### Use a previous version of STEPS
 
-There are git tags for every version of STEPS. To list them use the `git tag` command. Then:
+By default, this repository use the latest stable of STEPS but you can choose to use a specific one. There are git tags for every versions of STEPS. To list them use the `git tag` command. Then:
 
 ```bash
 $ git checkout TAG
