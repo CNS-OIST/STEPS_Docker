@@ -18,7 +18,6 @@ STEPS Python module.
 ```bash
 $ git clone https://github.com/CNS-OIST/STEPS_Docker
 $ cd STEPS_Docker
-$ git checkout 3.1
 $ export DUID=`id -u` DGID=`id -g` HOST=`hostname`
 $ docker-compose up lab
 Creating network "stepsdocker_default" with the default driver
@@ -56,6 +55,16 @@ You are free to modify the `notebooks` directory from either the container or
 your machine. Files created on one side will be visible on the other one, and vice versa!
 
 ## Advanced Usage
+
+### Use another version of STEPS
+
+There are git tags for every version of STEPS. To list them use the `git tag` command. Then:
+
+```bash
+$ git checkout TAG
+$ export DUID=`id -u` DGID=`id -g` HOST=`hostname`
+$ docker-compose up lab
+```
 
 ### Execute custom command in the container
 
