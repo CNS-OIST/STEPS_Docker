@@ -1,4 +1,4 @@
-FROM ubuntu:16.04
+FROM ubuntu:18.04
 MAINTAINER Tristan CAREL <tristan.carel@epfl.ch>
 
 RUN apt-get update \
@@ -18,6 +18,9 @@ RUN set -ex; \
     \
     fetchDeps=' \
         ca-certificates \
+        dirmngr \
+        gpg \
+        gpg-agent \
         wget \
     '; \
     apt-get update; \
@@ -38,7 +41,7 @@ RUN set -ex; \
 # verify that the binary works
     gosu nobody true
 
-ARG MINICONDA_VERSION=3-4.3.21
+ARG MINICONDA_VERSION=3-4.5.1
 
 RUN echo 'export PATH=/opt/conda/bin:$PATH' > /etc/profile.d/conda.sh \
  && wget --quiet https://repo.continuum.io/miniconda/Miniconda${MINICONDA_VERSION}-Linux-x86_64.sh -O ~/miniconda.sh \
