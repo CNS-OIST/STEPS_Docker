@@ -11,7 +11,8 @@ RUN apt-get update \
     libopenblas-dev \
     pandoc \
     python \
-    wget
+    wget \
+ && rm -rf /var/lib/apt/lists/*
 
 ENV GOSU_VERSION 1.11
 RUN dpkgArch="$(dpkg --print-architecture | awk -F- '{ print $NF }')" \
