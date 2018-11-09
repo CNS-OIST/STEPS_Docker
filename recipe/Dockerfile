@@ -11,16 +11,17 @@ RUN apt-get update \
     libopenblas-dev \
     pandoc \
     python \
-    wget
+    wget \
+ && rm -rf /var/lib/apt/lists/*
 
-ENV GOSU_VERSION 1.10
+ENV GOSU_VERSION 1.11
 RUN dpkgArch="$(dpkg --print-architecture | awk -F- '{ print $NF }')" \
  && wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$dpkgArch" \
  && chmod +x /usr/local/bin/gosu \
 # verify that the binary works
  && gosu nobody true
 
-ARG MINICONDA_VERSION=3-4.5.1
+ARG MINICONDA_VERSION=3-4.5.11
 
 RUN echo 'export PATH=/opt/conda/bin:$PATH' > /etc/profile.d/conda.sh \
  && wget --quiet https://repo.continuum.io/miniconda/Miniconda${MINICONDA_VERSION}-Linux-x86_64.sh -O ~/miniconda.sh \
