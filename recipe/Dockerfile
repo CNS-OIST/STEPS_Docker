@@ -31,7 +31,8 @@ RUN echo 'export PATH=/opt/conda/bin:$PATH' > /etc/profile.d/conda.sh \
     cython \
     jupyter \
     jupyterlab \
-    matplotlib
+    matplotlib \
+    python-libsbml
 
 ENV PATH "/opt/conda/bin:$PATH"
 
@@ -42,11 +43,8 @@ RUN if [ "x$BUILD_PETSC" = xtrue ] ; then ( \
  && /usr/bin/python2 ./configure \
      --prefix=/usr \
      --with-fc=0 \
-     --with-blas-lib=/usr/lib/libopenblas.so \
-     --with-mpi-dir=/usr/lib/mpich \
-     --with-lapack-lib=/usr/lib/libopenblas.so \
      --with-64-bit-indices \
-     --with-debugging=0 \
+     --with-debugging=0 COPTFLAGS='-O3 -march=native -mtune=native' CXXOPTFLAGS='-O3 -march=native -mtune=native' \
  && cd /var/src/petsc ; make MAKE_NP=1 \
  && make install \
  && rm -rf /var/src/petsc \
@@ -67,6 +65,15 @@ RUN git clone --recursive https://github.com/CNS-OIST/STEPS.git /var/src/STEPS \
 RUN git clone https://github.com/CNS-OIST/STEPS_Example.git /var/src/STEPS_Example \
  && mv /var/src/STEPS_Example/user_manual/source /var/src/user_manual \
  && rm -rf /var/src/STEPS_Example
+
+ARG EXAMPLE_NOTEBOOKS_TO_REBUILD="diffusion_boundary diffusion getting_started ip3 memb_pot sbml_importer surface_diffusion_boundary surface_diffusion well_mixed"
+# https://nbconvert.readthedocs.io/en/latest/usage.html#convert-notebook
+RUN cd /var/src/user_manual \
+ && jupyter nbconvert \
+     --to notebook \
+     --execute \
+     --inplace \
+     $EXAMPLE_NOTEBOOKS_TO_REBUILD
 
 ENV LANG en_US.utf8
 ENV SHELL=/bin/bash
