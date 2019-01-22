@@ -73,6 +73,7 @@ RUN cd /var/src/user_manual \
      --to notebook \
      --execute \
      --inplace \
+     --ExecutePreprocessor.timeout=360 \
      $EXAMPLE_NOTEBOOKS_TO_REBUILD
 
 ENV LANG en_US.utf8
