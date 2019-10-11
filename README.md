@@ -102,6 +102,45 @@ you to import your notebooks. In this case, you can either:
     docker-compose up notebook
     ```
 
+## Windows support
+
+This Docker image can be run with _Docker Desktop for Windows_. Instructions in the *Getting Started* section above are a bit different though. Instead of executing command _export DUID=`id -u` DGID=`id -g` HOST=`hostname`_, update the `docker-compose.yaml` file as follow:
+
+* **hostname**: hardcode the machine name
+* **USER_LOGIN**: hardcode your user name
+* **USER_ID**: 42
+* **GROUP_ID**: 42
+* **volumes**: replace `$PWD` by the path to this repository.
+
+for instance:
+```diff
+diff --git a/docker-compose.yml b/docker-compose.yml
+index 528e993..64dcca9 100644
+--- a/docker-compose.yml
++++ b/docker-compose.yml
+@@ -3,15 +3,15 @@ services:
+   lab:
+     image: cnsoist/steps:3.4
+     build: recipe
+-    hostname: $HOST
++    hostname: my-windows10-machine
+     ports:
+     - "8888:8888"
+     environment:
+-    - USER_LOGIN=$USER
+-    - USER_ID=$DUID
+-    - GROUP_ID=$DGID
++    - USER_LOGIN=tristan0x
++    - USER_ID=42
++    - GROUP_ID=42
+     volumes:
+-    - $PWD/notebooks:/opt/src/notebooks
++    - C:\Users\tristan0x\Documents\STEPS_Docker\notebooks:/opt/src/notebooks
+   notebook:
+     extends: lab
+     command:
+```
+
 ## License
 
 CNS-OIST STEPS is released under the terms of the GNU General Public License version 2
