@@ -1,7 +1,8 @@
 # CNS-OIST STEPS Docker Image
 
 This repository provides both the Docker recipe and runtime configuration
-of the official CNS-OIST STEPS Docker image.
+of the official
+[CNS-OIST STEPS Docker image](https://hub.docker.com/repository/docker/cnsoist/steps).
 
 ## Requirements
 
