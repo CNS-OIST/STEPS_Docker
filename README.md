@@ -19,7 +19,7 @@ STEPS Python module.
 ```bash
 $ git clone https://github.com/CNS-OIST/STEPS_Docker
 $ cd STEPS_Docker
-$ export DUID=`id -u` DGID=`id -g` HOST=`hostname`
+$ export DUID=$(id -u) DGID=$(id -g) HOST=$(hostname)
 $ docker-compose pull
 $ docker-compose up lab
 Creating network "stepsdocker_default" with the default driver
@@ -64,7 +64,7 @@ By default, this repository use the latest stable of STEPS but you can choose to
 
 ```bash
 $ git checkout TAG
-$ export DUID=`id -u` DGID=`id -g` HOST=`hostname`
+$ export DUID=$(id -u) DGID=$(id -g) HOST=$(hostname)
 $ docker-compose up lab
 ```
 
@@ -105,7 +105,7 @@ you to import your notebooks. In this case, you can either:
 
 ## Windows support
 
-This Docker image can be run with _Docker Desktop for Windows_. Instructions in the *Getting Started* section above are a bit different though. Instead of executing command _export DUID=`id -u` DGID=`id -g` HOST=`hostname`_, update the `docker-compose.yaml` file as follow:
+This Docker image can be run with _Docker Desktop for Windows_. Instructions in the *Getting Started* section above are a bit different though. Instead of executing command `export DUID=$(id -u) DGID=$(id -g) HOST=$(hostname)`, update the `docker-compose.yaml` file as follow:
 
 * **hostname**: hardcode the machine name
 * **USER_LOGIN**: hardcode your user name
