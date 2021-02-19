@@ -51,7 +51,7 @@ RUN if [ "x$BUILD_PETSC" = xtrue ] ; then ( \
  && ldconfig \
  ) fi
 
-ARG STEPS_VERSION=3.5.0
+ARG STEPS_VERSION=3.6.0
 RUN git clone --recursive https://github.com/CNS-OIST/STEPS.git /var/src/STEPS \
  && cd /var/src/STEPS \
  && git checkout "$STEPS_VERSION" \
