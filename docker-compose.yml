@@ -10,14 +10,22 @@ services:
     - USER_LOGIN=$USER
     - USER_ID=$DUID
     - GROUP_ID=$DGID
+    entrypoint: [/usr/bin/entrypoint]
+    command:
+    - jupyter
+    - lab
+    - --no-browser
+    - --allow-root
+    - --ip=0.0.0.0
+    - --notebook-dir=/opt/src/notebooks
     volumes:
     - $PWD/notebooks:/opt/src/notebooks
   notebook:
     extends: lab
     command:
-        - jupyter
-        - notebook
-        - --notebook-dir=/opt/src/notebooks
-        - --ip=0.0.0.0
-        - --no-browser
-        - --allow-root
+    - jupyter
+    - notebook
+    - --no-browser
+    - --allow-root
+    - --ip=0.0.0.0
+    - --notebook-dir=/opt/src/notebooks

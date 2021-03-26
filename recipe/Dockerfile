@@ -80,11 +80,3 @@ ENV LANG en_US.utf8
 ENV SHELL=/bin/bash
 
 ADD entrypoint /usr/bin/
-ENTRYPOINT ["/usr/bin/entrypoint"]
-
-CMD [ \
-    "jupyter", "lab", \
-    "--no-browser", "--allow-root", \
-    "--ip=0.0.0.0", \
-    "--notebook-dir=/opt/src/notebooks" \
-]
