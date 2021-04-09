@@ -1,0 +1,13 @@
+diff --git a/src/steps/tetode/tetode.cpp b/src/steps/tetode/tetode.cpp
+index 526f7ec..db1784a 100644
+--- a/src/steps/tetode/tetode.cpp
++++ b/src/steps/tetode/tetode.cpp
+@@ -31,7 +31,7 @@
+ #include <sstream>
+
+ #include <cvode/cvode.h>                 /* prototypes for CVODE fcts., consts. */
+-#include <cvode/cvode_dense.h>          /* prototype for CVDense */
++// #include <cvode/cvode_dense.h>          /* prototype for CVDense */
+ #include <nvector/nvector_serial.h>      /* serial N_Vector types, fcts., macros */
+ #include <sundials/sundials_dense.h>     /* definitions DlsMat DENSE_ELEM */
+ #include <sundials/sundials_nvector.h>
