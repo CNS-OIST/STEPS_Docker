@@ -89,8 +89,8 @@ RUN git clone --recursive https://github.com/CNS-OIST/STEPS.git /var/src/STEPS \
  && cd build \
  && cmake -DUSE_BUNDLE_SUNDIALS:BOOL=FALSE .. \
  && make all \
- && if [ "xSTEPS_UT_KEEP_GOING" = xtrue ] ; then \
-      ( make test ; true ) ; else \
+ && if [ "x$STEPS_UT_KEEP_GOING" = xtrue ] ; then \
+      ( make test || true ) ; else \
       make test ; \
     fi \
  && make install \
