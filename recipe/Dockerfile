@@ -19,8 +19,12 @@ RUN apt-get --yes -qq update \
                       gfortran \
                       git \
                       graphviz \
+                      htop      \
                       libblas-dev \
+                      libeigen3-dev \
+                      libgsl-dev \
                       liblapack-dev \
+                      libmetis-dev \
                       libopenblas-dev \
                       libopenmpi-dev \
                       libsundials-dev \
@@ -28,10 +32,9 @@ RUN apt-get --yes -qq update \
                       openmpi-bin \
                       pandoc \
                       python \
+                      vim       \
                       wget \
                       zlib1g-dev \
-                      vim       \
-                      htop      \
  && apt-get --yes -qq clean \
  && rm -rf /var/lib/apt/lists/*
 
