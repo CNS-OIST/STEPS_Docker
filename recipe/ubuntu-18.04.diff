@@ -1,0 +1,31 @@
+diff --git a/recipe/Dockerfile b/recipe/Dockerfile
+index 885ebe6..a086913 100644
+--- a/recipe/Dockerfile
++++ b/recipe/Dockerfile
+@@ -1,4 +1,4 @@
+-FROM ubuntu:20.04
++FROM ubuntu:18.04
+ MAINTAINER Tristan CAREL <tristan.carel@epfl.ch>
+ 
+ ARG DEBIAN_FRONTEND=noninteractive
+@@ -28,7 +28,7 @@ RUN apt-get --yes -qq update \
+                       libopenblas-dev \
+                       libopenmpi-dev \
+                       libsundials-dev \
+-                      libsundials-nvecserial3 \
++                      libsundials-nvecserial2 \
+                       openmpi-bin \
+                       pandoc \
+                       python \
+@@ -51,6 +51,11 @@ RUN dpkgArch="$(dpkg --print-architecture | awk -F- '{ print $NF }')" \
+ # verify that the binary works
+  && gosu nobody true
+ 
++ARG CMAKE_VERSION=3.15.7
++RUN wget https://github.com/Kitware/CMake/releases/download/v$CMAKE_VERSION/cmake-$CMAKE_VERSION-Linux-x86_64.sh \
++ && sh cmake-$CMAKE_VERSION-Linux-x86_64.sh --skip-license --prefix=/usr/local \
++ && rm -f cmake-$CMAKE_VERSION-Linux-x86_64.sh
++
+ ARG MINICONDA_VERSION=3-py38_4.9.2
+ RUN echo 'export PATH=/opt/conda/bin:$PATH' > /etc/profile.d/conda.sh \
+  && wget --quiet https://repo.continuum.io/miniconda/Miniconda${MINICONDA_VERSION}-Linux-x86_64.sh -O ~/miniconda.sh \
