@@ -19,9 +19,13 @@ RUN apt-get --yes -qq update \
                       gfortran \
                       git \
                       graphviz \
-                      htop      \
+                      htop \
                       libblas-dev \
                       libeigen3-dev \
+                      libboost-chrono-dev \
+                      libboost-system-dev \
+                      libboost-timer-dev \
+                      libglu1 \
                       libgsl-dev \
                       liblapack-dev \
                       libmetis-dev \
@@ -29,6 +33,9 @@ RUN apt-get --yes -qq update \
                       libopenmpi-dev \
                       libsundials-dev \
                       libsundials-nvecserial3 \
+                      libxcursor1 \
+                      libxft2 \
+                      libxinerama1 \
                       openmpi-bin \
                       pandoc \
                       python \
@@ -41,7 +48,7 @@ RUN apt-get --yes -qq update \
 RUN target=`readlink /usr/bin/mpirun` \
  && rm -f /usr/bin/mpirun \
  && echo "#!/bin/sh" >> /usr/bin/mpirun \
- && echo "$target --allow-run-as-root \$@" >> /usr/bin/mpirun \
+ && echo "$target --oversubscribe --allow-run-as-root \$@" >> /usr/bin/mpirun \
  && chmod +x /usr/bin/mpirun
 
 ENV GOSU_VERSION 1.11
@@ -61,18 +68,31 @@ RUN echo 'export PATH=/opt/conda/bin:$PATH' > /etc/profile.d/conda.sh \
     jupyter \
     jupyterlab \
     matplotlib \
+    mpi4py \
     nose \
     python-libsbml \
     scipy
 
 ENV PATH "/opt/conda/bin:$PATH"
 
+ARG GMSH_VERSION=4.8.4
+RUN cd /var/src \
+ && gmsh_sdk=gmsh-${GMSH_VERSION}-Linux64-sdk \
+ && get https://gmsh.info/bin/Linux/${gmsh_sdk}.tgz \
+ && tar zxf ${gmsh_sdk}.tgz \
+ && rm -rf ${gmsh_sdk}.tgz
+ENV PATH "/var/src/gmsh-${GMSH_VERSION}-Linux64-sdk"
+ENV CMAKE_PREFIX_PATH=/var/src/gmsh-${GMSH_VERSION}-Linux64-sdk
+
 ARG BUILD_OMEGA_H=true
 RUN if [ "x$BUILD_OMEGA_H" = xtrue ] ; then ( \
-    git clone -b v9.33.2 https://github.com/SNLComputation/omega_h.git /var/src/omega_h \
+    git clone -b v9.34.5 https://github.com/sandialabs/omega_h.git /var/src/omega_h \
  && mkdir /var/src/omega_h/_build \
  && cd /var/src/omega_h/_build \
- && cmake .. \
+ && cmake \
+      -DOmega_h_USE_Gmsh:BOOL=TRUE \
+      -DOmega_h_USE_MPI:BOOL=TRUE \
+      .. \
  && make -j 2 install \
  && ldconfig \
  && rm -rf /var/src/omega_h \
