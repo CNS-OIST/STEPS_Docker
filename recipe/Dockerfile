@@ -76,17 +76,19 @@ RUN echo 'export PATH=/opt/conda/bin:$PATH' > /etc/profile.d/conda.sh \
 ENV PATH "/opt/conda/bin:$PATH"
 
 ARG GMSH_VERSION=4.8.4
-RUN cd /var/src \
+RUN mkdir -p /var/src \
+ && cd /var/src \
  && gmsh_sdk=gmsh-${GMSH_VERSION}-Linux64-sdk \
- && get https://gmsh.info/bin/Linux/${gmsh_sdk}.tgz \
+ && wget https://gmsh.info/bin/Linux/${gmsh_sdk}.tgz \
  && tar zxf ${gmsh_sdk}.tgz \
  && rm -rf ${gmsh_sdk}.tgz
-ENV PATH "/var/src/gmsh-${GMSH_VERSION}-Linux64-sdk"
+ENV PATH "/var/src/gmsh-${GMSH_VERSION}-Linux64-sdk:$PATH"
 ENV CMAKE_PREFIX_PATH=/var/src/gmsh-${GMSH_VERSION}-Linux64-sdk
 
 ARG BUILD_OMEGA_H=true
+ARG OMEGA_H_VERSION=v9.29.2.dev1
 RUN if [ "x$BUILD_OMEGA_H" = xtrue ] ; then ( \
-    git clone -b v9.34.5 https://github.com/sandialabs/omega_h.git /var/src/omega_h \
+    git clone -b "$OMEGA_H_VERSION" https://github.com/BlueBrain/omega_h.git /var/src/omega_h \
  && mkdir /var/src/omega_h/_build \
  && cd /var/src/omega_h/_build \
  && cmake \
@@ -110,7 +112,10 @@ RUN git clone --recursive https://github.com/CNS-OIST/STEPS.git /var/src/STEPS \
  && patch -p1 </var/src/sundials3.diff \
  && mkdir build \
  && cd build \
- && cmake -DUSE_BUNDLE_SUNDIALS:BOOL=FALSE .. \
+ && cmake \
+      -DUSE_BUNDLE_SUNDIALS:BOOL=FALSE \
+      -DUSE_DISTRIBUTED_MESH:BOOL=TRUE \
+      .. \
  && make all \
  && if [ "x$STEPS_UT_KEEP_GOING" = xtrue ] ; then \
       ( make test || true ) ; else \
