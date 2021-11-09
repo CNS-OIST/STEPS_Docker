@@ -88,7 +88,10 @@ ENV CMAKE_PREFIX_PATH=/var/src/gmsh-${GMSH_VERSION}-Linux64-sdk
 ARG BUILD_OMEGA_H=true
 ARG OMEGA_H_VERSION=v9.29.2.dev1
 RUN if [ "x$BUILD_OMEGA_H" = xtrue ] ; then ( \
-    git clone -b "$OMEGA_H_VERSION" https://github.com/BlueBrain/omega_h.git /var/src/omega_h \
+    git clone \
+      --single-branch -b "$OMEGA_H_VERSION" \
+      https://github.com/BlueBrain/omega_h.git \
+      /var/src/omega_h \
  && mkdir /var/src/omega_h/_build \
  && cd /var/src/omega_h/_build \
  && cmake \
