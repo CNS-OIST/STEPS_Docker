@@ -58,7 +58,7 @@ RUN dpkgArch="$(dpkg --print-architecture | awk -F- '{ print $NF }')" \
 # verify that the binary works
  && gosu nobody true
 
-ARG MINICONDA_VERSION=3-py38_4.9.2
+ARG MINICONDA_VERSION=3-py39_4.11.0
 RUN echo 'export PATH=/opt/conda/bin:$PATH' > /etc/profile.d/conda.sh \
  && wget --quiet https://repo.continuum.io/miniconda/Miniconda${MINICONDA_VERSION}-Linux-x86_64.sh -O ~/miniconda.sh \
  && /bin/bash ~/miniconda.sh -b -p /opt/conda \
@@ -75,7 +75,7 @@ RUN echo 'export PATH=/opt/conda/bin:$PATH' > /etc/profile.d/conda.sh \
 
 ENV PATH "/opt/conda/bin:$PATH"
 
-ARG GMSH_VERSION=4.8.4
+ARG GMSH_VERSION=4.9.5
 RUN mkdir -p /var/src \
  && cd /var/src \
  && gmsh_sdk=gmsh-${GMSH_VERSION}-Linux64-sdk \
@@ -86,11 +86,11 @@ ENV PATH "/var/src/gmsh-${GMSH_VERSION}-Linux64-sdk:$PATH"
 ENV CMAKE_PREFIX_PATH=/var/src/gmsh-${GMSH_VERSION}-Linux64-sdk
 
 ARG BUILD_OMEGA_H=true
-ARG OMEGA_H_VERSION=v9.29.2.dev1
+ARG OMEGA_H_VERSION=v9.34.6
 RUN if [ "x$BUILD_OMEGA_H" = xtrue ] ; then ( \
     git clone \
       --single-branch -b "$OMEGA_H_VERSION" \
-      https://github.com/BlueBrain/omega_h.git \
+      https://github.com/sandialabs/omega_h.git \
       /var/src/omega_h \
  && mkdir /var/src/omega_h/_build \
  && cd /var/src/omega_h/_build \
@@ -105,7 +105,7 @@ RUN if [ "x$BUILD_OMEGA_H" = xtrue ] ; then ( \
 
 ADD FindSUNDIALS.diff sundials3.diff /var/src/
 
-ARG STEPS_VERSION=3.6.0
+ARG STEPS_VERSION=b554693
 ARG STEPS_UT_KEEP_GOING=true
 ENV CTEST_OUTPUT_ON_FAILURE=1
 RUN git clone --recursive https://github.com/CNS-OIST/STEPS.git /var/src/STEPS \
@@ -117,7 +117,7 @@ RUN git clone --recursive https://github.com/CNS-OIST/STEPS.git /var/src/STEPS \
  && cd build \
  && cmake \
       -DUSE_BUNDLE_SUNDIALS:BOOL=FALSE \
-      -DUSE_DISTRIBUTED_MESH:BOOL=TRUE \
+      -DSTEPS_USE_DIST_MESH:BOOL=TRUE \
       .. \
  && make all \
  && if [ "x$STEPS_UT_KEEP_GOING" = xtrue ] ; then \
