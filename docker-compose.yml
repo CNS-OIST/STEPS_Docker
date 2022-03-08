@@ -1,7 +1,7 @@
 version: '2.2'
 services:
   lab:
-    image: cnsoist/steps:gitlab
+    image: cnsoist/steps:3.6
     build: recipe
     hostname: $HOST
     ports:
@@ -20,12 +20,3 @@ services:
     - --notebook-dir=/opt/src/notebooks
     volumes:
     - $PWD/notebooks:/opt/src/notebooks
-  notebook:
-    extends: lab
-    command:
-    - jupyter
-    - notebook
-    - --no-browser
-    - --allow-root
-    - --ip=0.0.0.0
-    - --notebook-dir=/opt/src/notebooks

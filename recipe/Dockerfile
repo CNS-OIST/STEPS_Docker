@@ -83,7 +83,6 @@ RUN cd /var/src/user_manual \
      $EXAMPLE_NOTEBOOKS_TO_REBUILD
 
 ADD entrypoint /usr/bin/
-ENTRYPOINT ["/usr/bin/entrypoint"]
 
 CMD [ \
     "jupyter", "lab", \
