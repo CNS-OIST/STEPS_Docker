@@ -1,7 +1,7 @@
 version: '2.2'
 services:
   lab:
-    image: cnsoist/steps:3.6
+    image: cnsoist/steps:4.0.0
     build: recipe
     hostname: $HOST
     ports:

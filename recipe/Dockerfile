@@ -22,6 +22,7 @@ RUN apt-get --yes -qq update \
       libboost-dev       \
       libgmsh-dev        \
       libmpich-dev       \
+      libopenblas-dev    \
       petsc-dev          \
       pkg-config         \
       python3-matplotlib \
@@ -30,9 +31,10 @@ RUN apt-get --yes -qq update \
       python3-numpy      \
       python3-pip        \
       python3-scipy      \
+      wget               \
  && apt-get --yes -qq clean \
  && rm -rf /var/lib/apt/lists/* \
- && pip install python-libsbml
+ && pip install python-libsbml \
  && ldconfig
 
 RUN target=`readlink /usr/bin/mpirun` \
@@ -49,7 +51,7 @@ RUN dpkgArch="$(dpkg --print-architecture | awk -F- '{ print $NF }')" \
  && gosu nobody true
 
 ARG STEPS_REPOSITORY=STEPS
-ARG STEPS_VERSION=4.0
+ARG STEPS_VERSION=4.0.0
 ARG STEPS_ACCESS_TOKEN=
 ARG STEPS_UT_KEEP_GOING=true
 ENV CTEST_OUTPUT_ON_FAILURE=1
@@ -57,6 +59,7 @@ RUN git clone --recursive \
     https://${STEPS_ACCESS_TOKEN}github.com/CNS-OIST/${STEPS_REPOSITORY}.git /var/src/STEPS \
  && cd /var/src/STEPS \
  && git checkout "$STEPS_VERSION" \
+ && git submodule update --init --recursive \
  && mkdir build \
  && cd build \
  && cmake .. \
@@ -71,6 +74,9 @@ RUN git clone --recursive \
 RUN git clone https://github.com/CNS-OIST/STEPS_Example.git /var/src/STEPS_Example \
  && mv /var/src/STEPS_Example/user_manual/source /var/src/user_manual \
  && rm -rf /var/src/STEPS_Example
+
+RUN echo "/usr/lib/python3.8/config-3.8-x86_64-linux-gnu" >> /etc/ld.so.conf.d/python-lib.conf \
+  && ldconfig
 
 ARG EXAMPLE_NOTEBOOKS_TO_REBUILD="diffusion_boundary diffusion getting_started ip3 memb_pot sbml_importer surface_diffusion_boundary surface_diffusion well_mixed"
 # https://nbconvert.readthedocs.io/en/latest/usage.html#convert-notebook
