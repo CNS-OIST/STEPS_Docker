@@ -17,8 +17,6 @@ RUN apt-get --yes -qq update \
       gfortran           \
       git                \
       gmsh               \
-      jupyter            \
-      jupyter-nbconvert  \
       libboost-dev       \
       libgmsh-dev        \
       libmpich-dev       \
@@ -34,7 +32,7 @@ RUN apt-get --yes -qq update \
       wget               \
  && apt-get --yes -qq clean \
  && rm -rf /var/lib/apt/lists/* \
- && pip install python-libsbml \
+ && pip install python-libsbml jupyter jupyterlab nbconvert \
  && ldconfig
 
 RUN target=`readlink /usr/bin/mpirun` \
