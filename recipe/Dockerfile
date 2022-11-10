@@ -32,7 +32,11 @@ RUN apt-get --yes -qq update \
       wget               \
  && apt-get --yes -qq clean \
  && rm -rf /var/lib/apt/lists/* \
- && pip install python-libsbml jupyter jupyterlab nbconvert \
+ && pip install \
+      jupyter \
+      jupyterlab \
+      nbconvert \
+      python-libsbml \
  && ldconfig
 
 RUN target=`readlink /usr/bin/mpirun` \
