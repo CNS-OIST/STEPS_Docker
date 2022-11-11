@@ -25,7 +25,6 @@ RUN apt-get --yes -qq update \
       pkg-config         \
       python3-matplotlib \
       python3-mpi4py     \
-      python3-nose       \
       python3-numpy      \
       python3-pip        \
       python3-scipy      \
