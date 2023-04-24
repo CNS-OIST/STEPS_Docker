@@ -22,17 +22,13 @@ RUN apt-get --yes -qq update \
                       htop \
                       libblas-dev \
                       libeigen3-dev \
-                      libboost-chrono-dev \
-                      libboost-system-dev \
-                      libboost-timer-dev \
+                      libboost-dev \
                       libglu1 \
                       libgsl-dev \
                       liblapack-dev \
                       libmetis-dev \
                       libopenblas-dev \
                       libopenmpi-dev \
-                      libsundials-dev \
-                      libsundials-nvecserial3 \
                       libxcursor1 \
                       libxft2 \
                       libxinerama1 \
@@ -58,7 +54,7 @@ RUN dpkgArch="$(dpkg --print-architecture | awk -F- '{ print $NF }')" \
 # verify that the binary works
  && gosu nobody true
 
-ARG MINICONDA_VERSION=3-py38_4.9.2
+ARG MINICONDA_VERSION=3-py39_23.1.0-1
 RUN echo 'export PATH=/opt/conda/bin:$PATH' > /etc/profile.d/conda.sh \
  && wget --quiet https://repo.continuum.io/miniconda/Miniconda${MINICONDA_VERSION}-Linux-x86_64.sh -O ~/miniconda.sh \
  && /bin/bash ~/miniconda.sh -b -p /opt/conda \
@@ -75,7 +71,7 @@ RUN echo 'export PATH=/opt/conda/bin:$PATH' > /etc/profile.d/conda.sh \
 
 ENV PATH "/opt/conda/bin:$PATH"
 
-ARG GMSH_VERSION=4.8.4
+ARG GMSH_VERSION=4.11.1
 RUN mkdir -p /var/src \
  && cd /var/src \
  && gmsh_sdk=gmsh-${GMSH_VERSION}-Linux64-sdk \
@@ -86,7 +82,7 @@ ENV PATH "/var/src/gmsh-${GMSH_VERSION}-Linux64-sdk:$PATH"
 ENV CMAKE_PREFIX_PATH=/var/src/gmsh-${GMSH_VERSION}-Linux64-sdk
 
 ARG BUILD_OMEGA_H=true
-ARG OMEGA_H_VERSION=v9.29.2.dev1
+ARG OMEGA_H_VERSION=v9.34.13
 RUN if [ "x$BUILD_OMEGA_H" = xtrue ] ; then ( \
     git clone \
       --single-branch -b "$OMEGA_H_VERSION" \
@@ -105,7 +101,7 @@ RUN if [ "x$BUILD_OMEGA_H" = xtrue ] ; then ( \
 
 ADD FindSUNDIALS.diff sundials3.diff /var/src/
 
-ARG STEPS_VERSION=3.6.0
+ARG STEPS_VERSION=4.1.1
 ARG STEPS_UT_KEEP_GOING=true
 ENV CTEST_OUTPUT_ON_FAILURE=1
 RUN git clone --recursive https://github.com/CNS-OIST/STEPS.git /var/src/STEPS \
