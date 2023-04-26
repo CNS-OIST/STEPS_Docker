@@ -36,12 +36,6 @@ RUN apt-get --yes -qq update \
  && apt-get --yes -qq clean \
  && rm -rf /var/lib/apt/lists/*
 
-#RUN target=`readlink /usr/bin/mpirun` \
-# && rm -f /usr/bin/mpirun \
-# && echo "#!/bin/sh" >> /usr/bin/mpirun \
-# && echo "$target --oversubscribe --allow-run-as-root \$@" >> /usr/bin/mpirun \
-# && chmod +x /usr/bin/mpirun
-
 ENV GOSU_VERSION 1.11
 RUN dpkgArch="$(dpkg --print-architecture | awk -F- '{ print $NF }')" \
  && wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$dpkgArch" \
@@ -122,12 +116,21 @@ RUN git clone https://github.com/CNS-OIST/STEPS_Example.git /var/src/STEPS_Examp
  && mv /var/src/STEPS_Example/user_manual/source /var/src/user_manual \
  && rm -rf /var/src/STEPS_Example
 
-# ARG EXAMPLE_NOTEBOOKS_TO_REBUILD="diffusion_boundary diffusion getting_started ip3 memb_pot sbml_importer surface_diffusion_boundary surface_diffusion well_mixed"
+ARG EXAMPLE_NOTEBOOKS_TO_REBUILD="diffusion_boundary diffusion getting_started ip3 memb_pot sbml_importer surface_diffusion_boundary surface_diffusion well_mixed"
 # https://nbconvert.readthedocs.io/en/latest/usage.html#convert-notebook
-# RUN cd /var/src/user_manual \
-#  && jupyter nbconvert \
-#      --to notebook \
-#      --execute \
-#      --inplace \
-#      --ExecutePreprocessor.timeout=360 \
-#      $EXAMPLE_NOTEBOOKS_TO_REBUILD
+RUN cd /var/src/user_manual \
+ && jupyter nbconvert \
+      --to notebook \
+      --execute \
+      --inplace \
+      --ExecutePreprocessor.timeout=360 \
+      $EXAMPLE_NOTEBOOKS_TO_REBUILD
+
+ADD entrypoint /usr/bin/
+
+CMD [ \
+    "jupyter", "lab", \
+    "--no-browser", "--allow-root", \
+    "--ip=0.0.0.0", \
+    "--notebook-dir=/opt/src/notebooks" \
+]

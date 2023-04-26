@@ -20,4 +20,4 @@ services:
     - --notebook-dir=/opt/src/notebooks
     volumes:
     - $PWD/notebooks:/opt/src/notebooks
-  
+    scale: 1
