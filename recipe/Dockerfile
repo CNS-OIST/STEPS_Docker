@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM ubuntu:23.04
 MAINTAINER Tristan CAREL <tristan.carel@epfl.ch>
 
 ARG DEBIAN_FRONTEND=noninteractive
@@ -20,32 +20,27 @@ RUN apt-get --yes -qq update \
                       git \
                       graphviz \
                       htop \
-                      libblas-dev \
                       libeigen3-dev \
                       libboost-dev \
+                      libgl1 \
                       libglu1 \
                       libgsl-dev \
-                      liblapack-dev \
                       libmetis-dev \
-                      libopenblas-dev \
-                      libopenmpi-dev \
                       libxcursor1 \
                       libxft2 \
                       libxinerama1 \
-                      openmpi-bin \
                       pandoc \
-                      python \
                       vim       \
                       wget \
                       zlib1g-dev \
  && apt-get --yes -qq clean \
  && rm -rf /var/lib/apt/lists/*
 
-RUN target=`readlink /usr/bin/mpirun` \
- && rm -f /usr/bin/mpirun \
- && echo "#!/bin/sh" >> /usr/bin/mpirun \
- && echo "$target --oversubscribe --allow-run-as-root \$@" >> /usr/bin/mpirun \
- && chmod +x /usr/bin/mpirun
+#RUN target=`readlink /usr/bin/mpirun` \
+# && rm -f /usr/bin/mpirun \
+# && echo "#!/bin/sh" >> /usr/bin/mpirun \
+# && echo "$target --oversubscribe --allow-run-as-root \$@" >> /usr/bin/mpirun \
+# && chmod +x /usr/bin/mpirun
 
 ENV GOSU_VERSION 1.11
 RUN dpkgArch="$(dpkg --print-architecture | awk -F- '{ print $NF }')" \
@@ -64,10 +59,11 @@ RUN echo 'export PATH=/opt/conda/bin:$PATH' > /etc/profile.d/conda.sh \
     jupyter \
     jupyterlab \
     matplotlib \
-    mpi4py \
     nose \
     python-libsbml \
-    scipy
+    scipy \
+&& /opt/conda/bin/conda install mpi4py \
+&& /opt/conda/bin/conda install -c conda-forge petsc
 
 ENV PATH "/opt/conda/bin:$PATH"
 
@@ -79,27 +75,25 @@ RUN mkdir -p /var/src \
  && tar zxf ${gmsh_sdk}.tgz \
  && rm -rf ${gmsh_sdk}.tgz
 ENV PATH "/var/src/gmsh-${GMSH_VERSION}-Linux64-sdk:$PATH"
-ENV CMAKE_PREFIX_PATH=/var/src/gmsh-${GMSH_VERSION}-Linux64-sdk
+ENV CMAKE_PREFIX_PATH=/var/src/gmsh-${GMSH_VERSION}-Linux64-sdk:/opt/conda
 
 ARG BUILD_OMEGA_H=true
 ARG OMEGA_H_VERSION=v9.34.13
 RUN if [ "x$BUILD_OMEGA_H" = xtrue ] ; then ( \
     git clone \
       --single-branch -b "$OMEGA_H_VERSION" \
-      https://github.com/BlueBrain/omega_h.git \
+      https://github.com/sandialabs/omega_h.git \
       /var/src/omega_h \
  && mkdir /var/src/omega_h/_build \
  && cd /var/src/omega_h/_build \
  && cmake \
       -DOmega_h_USE_Gmsh:BOOL=TRUE \
       -DOmega_h_USE_MPI:BOOL=TRUE \
-      .. \
- && make -j 2 install \
- && ldconfig \
- && rm -rf /var/src/omega_h \
- ) fi
-
-ADD FindSUNDIALS.diff sundials3.diff /var/src/
+      .. \ 
+&& make -j 2 install \
+&& ldconfig \
+&& rm -rf /var/src/omega_h \
+   ) fi
 
 ARG STEPS_VERSION=4.1.1
 ARG STEPS_UT_KEEP_GOING=true
@@ -107,32 +101,33 @@ ENV CTEST_OUTPUT_ON_FAILURE=1
 RUN git clone --recursive https://github.com/CNS-OIST/STEPS.git /var/src/STEPS \
  && cd /var/src/STEPS \
  && git checkout "$STEPS_VERSION" \
- && patch -p1 </var/src/FindSUNDIALS.diff \
- && patch -p1 </var/src/sundials3.diff \
  && mkdir build \
  && cd build \
  && cmake \
-      -DUSE_BUNDLE_SUNDIALS:BOOL=FALSE \
+      -DUSE_BUNDLE_SUNDIALS:BOOL=TRUE \
+      -DUSE_BUNDLE_OMEGA_H:BOOL=FALSE \
+      -DUSE_MPI:BOOL=ON \
       -DUSE_DISTRIBUTED_MESH:BOOL=TRUE \
+      -DPYTHON_LIBRARY:FILEPATH=/opt/conda/lib/libpython3.9.so \
       .. \
- && make all \
+ && make -j all \
  && if [ "x$STEPS_UT_KEEP_GOING" = xtrue ] ; then \
       ( make test || true ) ; else \
       make test ; \
     fi \
- && make install \
- && rm -rf /var/src/STEPS
+&& make install \
+&& rm -rf /var/src/STEPS
 
 RUN git clone https://github.com/CNS-OIST/STEPS_Example.git /var/src/STEPS_Example \
  && mv /var/src/STEPS_Example/user_manual/source /var/src/user_manual \
  && rm -rf /var/src/STEPS_Example
 
-ARG EXAMPLE_NOTEBOOKS_TO_REBUILD="diffusion_boundary diffusion getting_started ip3 memb_pot sbml_importer surface_diffusion_boundary surface_diffusion well_mixed"
+# ARG EXAMPLE_NOTEBOOKS_TO_REBUILD="diffusion_boundary diffusion getting_started ip3 memb_pot sbml_importer surface_diffusion_boundary surface_diffusion well_mixed"
 # https://nbconvert.readthedocs.io/en/latest/usage.html#convert-notebook
-RUN cd /var/src/user_manual \
- && jupyter nbconvert \
-     --to notebook \
-     --execute \
-     --inplace \
-     --ExecutePreprocessor.timeout=360 \
-     $EXAMPLE_NOTEBOOKS_TO_REBUILD
+# RUN cd /var/src/user_manual \
+#  && jupyter nbconvert \
+#      --to notebook \
+#      --execute \
+#      --inplace \
+#      --ExecutePreprocessor.timeout=360 \
+#      $EXAMPLE_NOTEBOOKS_TO_REBUILD
