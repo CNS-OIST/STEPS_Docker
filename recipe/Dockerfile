@@ -92,9 +92,15 @@ RUN if [ "x$BUILD_OMEGA_H" = xtrue ] ; then ( \
 ARG STEPS_VERSION=4.1.1
 ARG STEPS_UT_KEEP_GOING=true
 ENV CTEST_OUTPUT_ON_FAILURE=1
-RUN git clone --recursive https://github.com/CNS-OIST/STEPS.git /var/src/STEPS \
+ARG STEPS_REPOSITORY=STEPS
+ARG STEPS_ACCESS_TOKEN=
+ARG STEPS_UT_KEEP_GOING=true
+ENV CTEST_OUTPUT_ON_FAILURE=1
+RUN git clone --recursive \
+    https://${STEPS_ACCESS_TOKEN}github.com/CNS-OIST/${STEPS_REPOSITORY}.git /var/src/STEPS \
  && cd /var/src/STEPS \
  && git checkout "$STEPS_VERSION" \
+ && git submodule update --init --recursive \
  && mkdir build \
  && cd build \
  && cmake \
@@ -109,12 +115,15 @@ RUN git clone --recursive https://github.com/CNS-OIST/STEPS.git /var/src/STEPS \
       ( make test || true ) ; else \
       make test ; \
     fi \
-&& make install \
-&& rm -rf /var/src/STEPS
+ && make install \
+ && rm -rf /var/src/STEPS
 
 RUN git clone https://github.com/CNS-OIST/STEPS_Example.git /var/src/STEPS_Example \
  && mv /var/src/STEPS_Example/user_manual/source /var/src/user_manual \
  && rm -rf /var/src/STEPS_Example
+
+RUN echo "/usr/lib/python3.8/config-3.8-x86_64-linux-gnu" >> /etc/ld.so.conf.d/python-lib.conf \
+  && ldconfig
 
 ARG EXAMPLE_NOTEBOOKS_TO_REBUILD="diffusion_boundary diffusion getting_started ip3 memb_pot sbml_importer surface_diffusion_boundary surface_diffusion well_mixed"
 # https://nbconvert.readthedocs.io/en/latest/usage.html#convert-notebook
