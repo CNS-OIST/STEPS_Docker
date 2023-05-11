@@ -110,7 +110,7 @@ RUN git clone --recursive \
       -DUSE_DISTRIBUTED_MESH:BOOL=TRUE \
       -DPYTHON_LIBRARY:FILEPATH=/opt/conda/lib/libpython3.9.so \
       .. \
- && make -j all \
+ && make -j 4 all \
  && if [ "x$STEPS_UT_KEEP_GOING" = xtrue ] ; then \
       ( make test || true ) ; else \
       make test ; \
