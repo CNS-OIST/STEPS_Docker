@@ -131,16 +131,24 @@ index 528e993..64dcca9 100644
 -    - USER_LOGIN=$USER
 -    - USER_ID=$DUID
 -    - GROUP_ID=$DGID
-+    - USER_LOGIN=tristan0x
++    - USER_LOGIN=YOUR_USER_NAME
 +    - USER_ID=42
 +    - GROUP_ID=42
      volumes:
 -    - $PWD/notebooks:/opt/src/notebooks
-+    - C:\Users\tristan0x\Documents\STEPS_Docker\notebooks:/opt/src/notebooks
++    - C:\Users\YOUR_USER_NAME\Documents\STEPS_Docker\notebooks:/opt/src/notebooks
    notebook:
      extends: lab
      command:
 ```
+
+Before running `docker-compose build`, it is imperative to open `./recipe/entrypoint` with Visual Code (or your favourite text editor), and change the **End of Line Sequence** from `CRLF` to `LF`.
+
+From:
+![image](images/crlf.png)
+
+To:
+![image](images/lf.png)
 
 ## License
 
