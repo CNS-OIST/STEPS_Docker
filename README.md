@@ -110,6 +110,7 @@ This Docker image can be run with _Docker Desktop for Windows_. Instructions in 
 * **hostname**: hardcode the machine name
 * **USER_LOGIN**: hardcode your user name
 * **USER_ID**: 42
+  * If you get an error similar to `steps_docker-lab-1  | useradd: UID 42 is not unique`, you can change this value to an other arbitrary one, e.g. 43.
 * **GROUP_ID**: 42
 * **volumes**: replace `$PWD` by the path to this repository.
 
