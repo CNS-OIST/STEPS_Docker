@@ -11,7 +11,7 @@ You must have:
 * [Docker Compose](https://docs.docker.com/compose) utility installed.
 * [Git](https://git-scm.com/)
 
-## Getting Started
+## Getting Started (MacOS & Linux)
 
 The set of commands below will start a JupyterLab container providing
 STEPS Python module.
@@ -19,7 +19,7 @@ STEPS Python module.
 ```bash
 $ git clone https://github.com/CNS-OIST/STEPS_Docker
 $ cd STEPS_Docker
-$ export DUID=$(id -u) DGID=$(id -g) HOST=$(hostname)
+$ echo "DUID=$(($(id -u)+1))\nDGID=$(id -g)\nHOST=$(hostname)" > .env
 $ docker-compose build
 $ docker-compose up
 Creating network "stepsdocker_default" with the default driver
@@ -64,7 +64,7 @@ By default, this repository use the latest stable of STEPS but you can choose to
 
 ```bash
 $ git checkout TAG
-$ export DUID=$(id -u) DGID=$(id -g) HOST=$(hostname)
+$ echo "DUID=$(($(id -u)+1))\nDGID=$(id -g)\nHOST=$(hostname)" > .env
 $ docker-compose up lab
 ```
 
@@ -105,7 +105,7 @@ you to import your notebooks. In this case, you can either:
 
 ## Windows support
 
-This Docker image can be run with _Docker Desktop for Windows_. Instructions in the *Getting Started* section above are a bit different though. Instead of executing command `export DUID=$(id -u) DGID=$(id -g) HOST=$(hostname)`, update the `docker-compose.yaml` file as follow:
+This Docker image can be run with _Docker Desktop for Windows_. Instructions in the *Getting Started* section above are a bit different though. Instead of executing command `echo "DUID=$(($(id -u)+1))\nDGID=$(id -g)\nHOST=$(hostname)" > .env`, update the `docker-compose.yaml` file as follow:
 
 * **hostname**: hardcode the machine name
 * **USER_LOGIN**: hardcode your user name
