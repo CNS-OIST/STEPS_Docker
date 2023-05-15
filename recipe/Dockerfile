@@ -84,18 +84,14 @@ RUN if [ "x$BUILD_OMEGA_H" = xtrue ] ; then ( \
       -DOmega_h_USE_Gmsh:BOOL=TRUE \
       -DOmega_h_USE_MPI:BOOL=TRUE \
       .. \ 
-&& make -j 2 install \
+&& make -j 4 install \
 && ldconfig \
 && rm -rf /var/src/omega_h \
    ) fi
 
 ARG STEPS_VERSION=4.1.1
-ARG STEPS_UT_KEEP_GOING=true
-ENV CTEST_OUTPUT_ON_FAILURE=1
 ARG STEPS_REPOSITORY=STEPS
 ARG STEPS_ACCESS_TOKEN=
-ARG STEPS_UT_KEEP_GOING=true
-ENV CTEST_OUTPUT_ON_FAILURE=1
 RUN git clone --recursive \
     https://${STEPS_ACCESS_TOKEN}github.com/CNS-OIST/${STEPS_REPOSITORY}.git /var/src/STEPS \
  && cd /var/src/STEPS \
@@ -111,10 +107,6 @@ RUN git clone --recursive \
       -DPYTHON_LIBRARY:FILEPATH=/opt/conda/lib/libpython3.9.so \
       .. \
  && make -j 4 all \
- && if [ "x$STEPS_UT_KEEP_GOING" = xtrue ] ; then \
-      ( make test || true ) ; else \
-      make test ; \
-    fi \
  && make install \
  && rm -rf /var/src/STEPS
 
