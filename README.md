@@ -11,7 +11,7 @@ You must have:
 * [Docker Compose](https://docs.docker.com/compose) utility installed.
 * [Git](https://git-scm.com/)
 
-## Getting Started
+## Getting Started (MacOS & Linux)
 
 The set of commands below will start a JupyterLab container providing
 STEPS Python module.
@@ -19,9 +19,9 @@ STEPS Python module.
 ```bash
 $ git clone https://github.com/CNS-OIST/STEPS_Docker
 $ cd STEPS_Docker
-$ export DUID=$(id -u) DGID=$(id -g) HOST=$(hostname)
-$ docker-compose pull
-$ docker-compose up lab
+$ echo "DUID=$(($(id -u)+1))\nDGID=$(id -g)\nHOST=$(hostname)" > .env
+$ docker-compose build
+$ docker-compose up
 Creating network "stepsdocker_default" with the default driver
 Creating stepsdocker_lab_1 ...
 Creating stepsdocker_lab_1 ... done
@@ -64,7 +64,7 @@ By default, this repository use the latest stable of STEPS but you can choose to
 
 ```bash
 $ git checkout TAG
-$ export DUID=$(id -u) DGID=$(id -g) HOST=$(hostname)
+$ echo "DUID=$(($(id -u)+1))\nDGID=$(id -g)\nHOST=$(hostname)" > .env
 $ docker-compose up lab
 ```
 
@@ -105,11 +105,12 @@ you to import your notebooks. In this case, you can either:
 
 ## Windows support
 
-This Docker image can be run with _Docker Desktop for Windows_. Instructions in the *Getting Started* section above are a bit different though. Instead of executing command `export DUID=$(id -u) DGID=$(id -g) HOST=$(hostname)`, update the `docker-compose.yaml` file as follow:
+This Docker image can be run with _Docker Desktop for Windows_. Instructions in the *Getting Started* section above are a bit different though. Instead of executing command `echo "DUID=$(($(id -u)+1))\nDGID=$(id -g)\nHOST=$(hostname)" > .env`, update the `docker-compose.yaml` file as follow:
 
 * **hostname**: hardcode the machine name
 * **USER_LOGIN**: hardcode your user name
 * **USER_ID**: 42
+  * If you get an error similar to `steps_docker-lab-1  | useradd: UID 42 is not unique`, you can change this value to an other arbitrary one, e.g. 43.
 * **GROUP_ID**: 42
 * **volumes**: replace `$PWD` by the path to this repository.
 
@@ -131,16 +132,24 @@ index 528e993..64dcca9 100644
 -    - USER_LOGIN=$USER
 -    - USER_ID=$DUID
 -    - GROUP_ID=$DGID
-+    - USER_LOGIN=tristan0x
++    - USER_LOGIN=YOUR_USER_NAME
 +    - USER_ID=42
 +    - GROUP_ID=42
      volumes:
 -    - $PWD/notebooks:/opt/src/notebooks
-+    - C:\Users\tristan0x\Documents\STEPS_Docker\notebooks:/opt/src/notebooks
++    - C:\Users\YOUR_USER_NAME\Documents\STEPS_Docker\notebooks:/opt/src/notebooks
    notebook:
      extends: lab
      command:
 ```
+
+Before running `docker-compose build`, it is imperative to open `./recipe/entrypoint` with Visual Code (or your favourite text editor), and change the **End of Line Sequence** from `CRLF` to `LF`.
+
+From:
+![image](images/crlf.png)
+
+To:
+![image](images/lf.png)
 
 ## License
 

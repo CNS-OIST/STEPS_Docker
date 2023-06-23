@@ -1,7 +1,7 @@
 version: '2.2'
 services:
   lab:
-    image: cnsoist/steps:4.0.0
+    image: cnsoist/steps:4.1.1
     build: recipe
     hostname: $HOST
     ports:
@@ -20,3 +20,4 @@ services:
     - --notebook-dir=/opt/src/notebooks
     volumes:
     - $PWD/notebooks:/opt/src/notebooks
+    scale: 1
