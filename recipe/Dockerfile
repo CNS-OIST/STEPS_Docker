@@ -1,4 +1,4 @@
-FROM ubuntu:23.04
+FROM --platform=linux/amd64 ubuntu:23.04
 MAINTAINER Tristan CAREL <tristan.carel@epfl.ch>
 
 ARG DEBIAN_FRONTEND=noninteractive
