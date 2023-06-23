@@ -83,13 +83,16 @@ RUN if [ "x$BUILD_OMEGA_H" = xtrue ] ; then ( \
  && cmake \
       -DOmega_h_USE_Gmsh:BOOL=TRUE \
       -DOmega_h_USE_MPI:BOOL=TRUE \
-      .. \ 
+      .. \
 && make -j 4 install \
 && ldconfig \
 && rm -rf /var/src/omega_h \
    ) fi
 
 ARG STEPS_VERSION=4.1.1
+ARG STEPS_UT=false
+ARG STEPS_UT_KEEP_GOING=true
+ENV CTEST_OUTPUT_ON_FAILURE=1
 ARG STEPS_REPOSITORY=STEPS
 ARG STEPS_ACCESS_TOKEN=
 RUN git clone --recursive \
@@ -107,6 +110,12 @@ RUN git clone --recursive \
       -DPYTHON_LIBRARY:FILEPATH=/opt/conda/lib/libpython3.9.so \
       .. \
  && make -j 4 all \
+ && ([ "$STEPS_UT" = false ] || \
+      if [ "x$STEPS_UT_KEEP_GOING" = xtrue ] ; then \
+        ( make test || true ) ; else \
+        make test ; \
+      fi \
+    ) \
  && make install \
  && rm -rf /var/src/STEPS
 
