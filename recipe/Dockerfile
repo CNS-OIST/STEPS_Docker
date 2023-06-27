@@ -49,15 +49,17 @@ RUN echo 'export PATH=/opt/conda/bin:$PATH' > /etc/profile.d/conda.sh \
  && /bin/bash ~/miniconda.sh -b -p /opt/conda \
  && rm ~/miniconda.sh \
  && /opt/conda/bin/pip install \
+    build \
     cython \
     jupyter \
     jupyterlab \
     matplotlib \
     nose \
+    pip-tools \
     python-libsbml \
     scipy \
-&& /opt/conda/bin/conda install mpi4py \
-&& /opt/conda/bin/conda install -c conda-forge petsc
+&& /opt/conda/bin/conda install mpi4py h5py \
+&& /opt/conda/bin/conda install -c conda-forge petsc petsc4py
 
 ENV PATH "/opt/conda/bin:$PATH"
 
