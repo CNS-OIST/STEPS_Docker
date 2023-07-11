@@ -49,15 +49,17 @@ RUN echo 'export PATH=/opt/conda/bin:$PATH' > /etc/profile.d/conda.sh \
  && /bin/bash ~/miniconda.sh -b -p /opt/conda \
  && rm ~/miniconda.sh \
  && /opt/conda/bin/pip install \
+    build \
     cython \
     jupyter \
     jupyterlab \
     matplotlib \
     nose \
+    pip-tools \
     python-libsbml \
     scipy \
-&& /opt/conda/bin/conda install mpi4py \
-&& /opt/conda/bin/conda install -c conda-forge petsc
+&& /opt/conda/bin/conda install mpi4py h5py \
+&& /opt/conda/bin/conda install -c conda-forge petsc petsc4py
 
 ENV PATH "/opt/conda/bin:$PATH"
 
@@ -89,7 +91,7 @@ RUN if [ "x$BUILD_OMEGA_H" = xtrue ] ; then ( \
 && rm -rf /var/src/omega_h \
    ) fi
 
-ARG STEPS_VERSION=4.1.1
+ARG STEPS_VERSION=5.0.0_beta
 ARG STEPS_UT=false
 ARG STEPS_UT_KEEP_GOING=true
 ENV CTEST_OUTPUT_ON_FAILURE=1
