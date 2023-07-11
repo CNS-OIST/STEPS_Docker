@@ -91,7 +91,7 @@ RUN if [ "x$BUILD_OMEGA_H" = xtrue ] ; then ( \
 && rm -rf /var/src/omega_h \
    ) fi
 
-ARG STEPS_VERSION=4.1.1
+ARG STEPS_VERSION=5.0.0_beta
 ARG STEPS_UT=false
 ARG STEPS_UT_KEEP_GOING=true
 ENV CTEST_OUTPUT_ON_FAILURE=1
