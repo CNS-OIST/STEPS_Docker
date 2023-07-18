@@ -1,0 +1,13 @@
+diff --git a/src/third_party/fau.de/include/fau.de/overlap.hpp b/src/third_party/fau.de/include/fau.de/overlap.hpp
+index 0a26a94b..21d23c0e 100644
+--- a/src/third_party/fau.de/include/fau.de/overlap.hpp
++++ b/src/third_party/fau.de/include/fau.de/overlap.hpp
+@@ -103,7 +103,7 @@ struct double_prec_constant<double> {
+ };
+ 
+ // For GCC an attribute has to be used to control the FP precision...
+-#if defined(__GNUC__) && !defined(__clang__) && !defined(__ICC) && \
++#if defined(__x86_64__) && defined(__GNUC__) && !defined(__clang__) && !defined(__ICC) && \
+ 	!defined(__INTEL_COMPILER)
+ #define ENFORCE_EXACT_FPMATH_ATTR __attribute__((__target__("ieee-fp")))
+ #else

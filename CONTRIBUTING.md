@@ -56,7 +56,7 @@ maintainers.
 
 ### How to release a new Docker image?
 
-Whenever a new version of STEPS is released, this repository must be
+Whenever a new version of STEPS is released, this repository may be
 updated to publish the corresponding Docker image.
 
 1.  Update the `STEPS_VERSION` argument in the `recipe/Dockerfile` file
@@ -111,3 +111,20 @@ updated to publish the corresponding Docker image.
 
     DockerHub will be notified by GitHub when the tag is pushed, and will
     trigger the build of the new Docker image.
+
+## How to release multi-platform Docker images?
+
+To maximize performances of Docker containers running on Apple M1/M2
+architectures, it is necessary to upload Docker images on DockerHub dedicated
+to these platforms. To do so, it is recommenced to use 
+[BuildKit](https://docs.docker.com/build/buildkit), an improved Docker
+backend, which is the default since Docker 23.0.
+
+For instance, the following command executed on an ARM machine will:
+1. Create 2 Docker images in parallel, one targeting platform `linux/amd64`,
+   the other `linux/arm64`
+1. Upload them to DockerHub
+
+```
+docker buildx build --platform linux/amd64,linux/arm64 --build-arg STEPS_UT=false -t cnsoist/steps:5.0.0_beta --push recipe
+```
