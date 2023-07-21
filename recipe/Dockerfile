@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 ubuntu:23.04
+FROM ubuntu:23.04
 MAINTAINER Tristan CAREL <tristan.carel@epfl.ch>
 
 ARG DEBIAN_FRONTEND=noninteractive
@@ -43,9 +43,11 @@ RUN dpkgArch="$(dpkg --print-architecture | awk -F- '{ print $NF }')" \
 # verify that the binary works
  && gosu nobody true
 
-ARG MINICONDA_VERSION=3-py39_23.1.0-1
+ARG MINICONDA_VERSION=3-py39_23.3.1-0
 RUN echo 'export PATH=/opt/conda/bin:$PATH' > /etc/profile.d/conda.sh \
- && wget --quiet https://repo.continuum.io/miniconda/Miniconda${MINICONDA_VERSION}-Linux-x86_64.sh -O ~/miniconda.sh \
+ && dpkgArch="$(dpkg --print-architecture | awk -F- '{ print $NF }')" \
+ && minicondaArch="$(case $dpkgArch in amd64) echo x86_64 ;; arm64) echo aarch64 ;; *) echo Unexpected arch: $dpkgArch; false ;; esac)" \
+ && wget --quiet https://repo.continuum.io/miniconda/Miniconda${MINICONDA_VERSION}-Linux-${minicondaArch}.sh -O ~/miniconda.sh \
  && /bin/bash ~/miniconda.sh -b -p /opt/conda \
  && rm ~/miniconda.sh \
  && /opt/conda/bin/pip install \
@@ -62,16 +64,23 @@ RUN echo 'export PATH=/opt/conda/bin:$PATH' > /etc/profile.d/conda.sh \
 && /opt/conda/bin/conda install -c conda-forge petsc petsc4py
 
 ENV PATH "/opt/conda/bin:$PATH"
+ENV CMAKE_PREFIX_PATH=/opt/conda
 
 ARG GMSH_VERSION=4.11.1
-RUN mkdir -p /var/src \
- && cd /var/src \
- && gmsh_sdk=gmsh-${GMSH_VERSION}-Linux64-sdk \
- && wget https://gmsh.info/bin/Linux/${gmsh_sdk}.tgz \
- && tar zxf ${gmsh_sdk}.tgz \
- && rm -rf ${gmsh_sdk}.tgz
-ENV PATH "/var/src/gmsh-${GMSH_VERSION}-Linux64-sdk:$PATH"
-ENV CMAKE_PREFIX_PATH=/var/src/gmsh-${GMSH_VERSION}-Linux64-sdk:/opt/conda
+RUN wget https://gmsh.info/src/gmsh-${GMSH_VERSION}-source.tgz \
+ && tar zxf gmsh-${GMSH_VERSION}-source.tgz \
+ && cd gmsh-${GMSH_VERSION}-source \
+ && cmake \
+      -DCMAKE_INSTALL_PREFIX=/opt/gmsh-${GMSH_VERSION} \
+      -DENABLE_BUILD_SHARED:BOOL=True \
+      -DENABLE_BUILD_DYNAMIC:BOOL=True \
+      -DENABLE_FLTK:BOOL=FALSE . \
+ && make -j 4 \
+ && make install \
+ && cd .. \
+ && rm -rf gmsh-${GMSH_VERSION}-source
+ENV PATH "/opt/gmsh-${GMSH_VERSION}/bin:$PATH"
+ENV CMAKE_PREFIX_PATH="/opt/gmsh-${GMSH_VERSION}:${CMAKE_PREFIX_PATH}"
 
 ARG BUILD_OMEGA_H=true
 ARG OMEGA_H_VERSION=v9.34.13
@@ -91,6 +100,7 @@ RUN if [ "x$BUILD_OMEGA_H" = xtrue ] ; then ( \
 && rm -rf /var/src/omega_h \
    ) fi
 
+ADD overlap-arm64.patch /var/src/
 ARG STEPS_VERSION=5.0.0_beta
 ARG STEPS_UT=false
 ARG STEPS_UT_KEEP_GOING=true
@@ -102,6 +112,7 @@ RUN git clone --recursive \
  && cd /var/src/STEPS \
  && git checkout "$STEPS_VERSION" \
  && git submodule update --init --recursive \
+ && patch -p1 < /var/src/overlap-arm64.patch \
  && mkdir build \
  && cd build \
  && cmake \
@@ -135,7 +146,7 @@ RUN cd /var/src/user_manual \
       --to notebook \
       --execute \
       --inplace \
-      --ExecutePreprocessor.timeout=360 \
+      --ExecutePreprocessor.timeout=3600 \
       $EXAMPLE_NOTEBOOKS_TO_REBUILD
 
 ADD entrypoint /usr/bin/
