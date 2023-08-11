@@ -107,6 +107,7 @@ ARG STEPS_UT_KEEP_GOING=true
 ENV CTEST_OUTPUT_ON_FAILURE=1
 ARG STEPS_REPOSITORY=STEPS
 ARG STEPS_ACCESS_TOKEN=
+ARG STEPS_NATIVE_ARCH=False
 RUN git clone --recursive \
     https://${STEPS_ACCESS_TOKEN}github.com/CNS-OIST/${STEPS_REPOSITORY}.git /var/src/STEPS \
  && cd /var/src/STEPS \
@@ -116,6 +117,7 @@ RUN git clone --recursive \
  && mkdir build \
  && cd build \
  && cmake \
+      -DTARGET_NATIVE_ARCH:BOOL="$STEPS_NATIVE_ARCH" \
       -DUSE_BUNDLE_SUNDIALS:BOOL=TRUE \
       -DUSE_BUNDLE_OMEGA_H:BOOL=FALSE \
       -DUSE_MPI:BOOL=ON \
