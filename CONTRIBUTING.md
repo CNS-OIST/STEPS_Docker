@@ -116,11 +116,11 @@ updated to publish the corresponding Docker image.
 
 To maximize performances of Docker containers running on Apple M1/M2
 architectures, it is necessary to upload Docker images on DockerHub dedicated
-to these platforms. To do so, it is recommenced to use 
+to these platforms. To do so, it is recommended to use 
 [BuildKit](https://docs.docker.com/build/buildkit), an improved Docker
 backend, which is the default since Docker 23.0.
 
-For instance, the following command executed on an ARM machine will:
+Assuming that Docker 23.0 or higher is installed, and a builder instance has been previously created (with command `docker buildx create --use` for instance), the following command will:
 1. Create 2 Docker images in parallel, one targeting platform `linux/amd64`,
    the other `linux/arm64`
 1. Upload them to DockerHub
