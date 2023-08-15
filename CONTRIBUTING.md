@@ -147,8 +147,13 @@ The simplest way is to execute: `docker buildx create --use`
 
 The following command will:
 1. Create 2 Docker images in parallel, one targeting platform `linux/amd64`, the other `linux/arm64`
-1. Upload them to DockerHub
+1. Upload them to DockerHub as `cnsoist/steps:latest`
 
 ```
-docker buildx build --platform linux/amd64,linux/arm64 --build-arg STEPS_UT=false -t cnsoist/steps:5.0.0_beta --push recipe
+docker buildx build --platform linux/amd64,linux/arm64 --build-arg STEPS_UT=false -t cnsoist/steps:latest --push recipe
+```
+
+To create tag alias `5.0.0` on Docker Hub:
+```
+docker buildx imagetools create -t cnsoist/steps:5.0.0 cnsoist/steps:latest
 ```
