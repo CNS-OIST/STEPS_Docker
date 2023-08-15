@@ -120,9 +120,33 @@ to these platforms. To do so, it is recommended to use
 [BuildKit](https://docs.docker.com/build/buildkit), an improved Docker
 backend, which is the default since Docker 23.0.
 
-Assuming that Docker 23.0 or higher is installed, and a builder instance has been previously created (with command `docker buildx create --use` for instance), the following command will:
-1. Create 2 Docker images in parallel, one targeting platform `linux/amd64`,
-   the other `linux/arm64`
+### Linux installation procedure 
+
+#### Install Docker 23.0
+
+ You will need to remove the previous installation if any, and rely on the APT sources provided by Docker to install the latest version. All the commands are available here: https://docs.docker.com/engine/install/ubuntu/
+
+#### Turn on experimental features
+
+1. add "experimental": true  to the `/etc/docker/daemon.json` file. Create it if missing. For instance:
+   ```json
+   {
+       "experimental": true
+   }
+   ```
+2. restart the service: `sudo service docker restart`
+3. the command `docker version` should show that the _Engine_  section has _Experimental: true_
+
+### Build the STEPS Docker images
+
+#### Create a Docker build instance
+
+The simplest way is to execute: `docker buildx create --use`
+
+#### Cross build
+
+The following command will:
+1. Create 2 Docker images in parallel, one targeting platform `linux/amd64`, the other `linux/arm64`
 1. Upload them to DockerHub
 
 ```
