@@ -60,7 +60,7 @@ RUN echo 'export PATH=/opt/conda/bin:$PATH' > /etc/profile.d/conda.sh \
     pip-tools \
     python-libsbml \
     scipy \
-&& /opt/conda/bin/conda install mpi4py h5py \
+&& /opt/conda/bin/conda install "h5py>=2.9=mpi*" \
 && /opt/conda/bin/conda install -c conda-forge petsc petsc4py
 
 ENV PATH "/opt/conda/bin:$PATH"
