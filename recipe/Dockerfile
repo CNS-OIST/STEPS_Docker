@@ -50,9 +50,11 @@ RUN echo 'export PATH=/opt/conda/bin:$PATH' > /etc/profile.d/conda.sh \
  && wget --quiet https://repo.continuum.io/miniconda/Miniconda${MINICONDA_VERSION}-Linux-${minicondaArch}.sh -O ~/miniconda.sh \
  && /bin/bash ~/miniconda.sh -b -p /opt/conda \
  && rm ~/miniconda.sh \
+ && /opt/conda/bin/conda install mpi4py \
  && /opt/conda/bin/pip install \
     build \
     cython \
+    "h5py>=2.9=mpi*" \
     jupyter \
     jupyterlab \
     matplotlib \
@@ -60,7 +62,6 @@ RUN echo 'export PATH=/opt/conda/bin:$PATH' > /etc/profile.d/conda.sh \
     pip-tools \
     python-libsbml \
     scipy \
-&& /opt/conda/bin/conda install "h5py>=2.9=mpi*" \
 && /opt/conda/bin/conda install -c conda-forge petsc petsc4py
 
 ENV PATH "/opt/conda/bin:$PATH"
