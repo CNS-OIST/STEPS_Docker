@@ -60,8 +60,7 @@ RUN echo 'export PATH=/opt/conda/bin:$PATH' > /etc/profile.d/conda.sh \
     pip-tools \
     python-libsbml \
     scipy \
-&& /opt/conda/bin/conda install "h5py>=2.9=mpi*" \
-&& /opt/conda/bin/conda install -c conda-forge petsc petsc4py
+&& /opt/conda/bin/conda install -c conda-forge "h5py[version='>=2.9',build=mpi*]" petsc petsc4py
 
 ENV PATH "/opt/conda/bin:$PATH"
 ENV CMAKE_PREFIX_PATH=/opt/conda
