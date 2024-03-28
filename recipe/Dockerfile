@@ -26,6 +26,7 @@ RUN apt-get --yes -qq update \
                       libglu1 \
                       libgsl-dev \
                       libmetis-dev \
+                      librdmacm-dev \
                       libxcursor1 \
                       libxft2 \
                       libxinerama1 \
@@ -43,7 +44,7 @@ RUN dpkgArch="$(dpkg --print-architecture | awk -F- '{ print $NF }')" \
 # verify that the binary works
  && gosu nobody true
 
-ARG MINICONDA_VERSION=3-py39_23.3.1-0
+ARG MINICONDA_VERSION=3-py310_24.1.2-0
 RUN echo 'export PATH=/opt/conda/bin:$PATH' > /etc/profile.d/conda.sh \
  && dpkgArch="$(dpkg --print-architecture | awk -F- '{ print $NF }')" \
  && minicondaArch="$(case $dpkgArch in amd64) echo x86_64 ;; arm64) echo aarch64 ;; *) echo Unexpected arch: $dpkgArch; false ;; esac)" \
@@ -65,7 +66,7 @@ RUN echo 'export PATH=/opt/conda/bin:$PATH' > /etc/profile.d/conda.sh \
 ENV PATH "/opt/conda/bin:$PATH"
 ENV CMAKE_PREFIX_PATH=/opt/conda
 
-ARG GMSH_VERSION=4.11.1
+ARG GMSH_VERSION=4.12.2
 RUN wget https://gmsh.info/src/gmsh-${GMSH_VERSION}-source.tgz \
  && tar zxf gmsh-${GMSH_VERSION}-source.tgz \
  && cd gmsh-${GMSH_VERSION}-source \
@@ -100,7 +101,7 @@ RUN if [ "x$BUILD_OMEGA_H" = xtrue ] ; then ( \
    ) fi
 
 ADD overlap-arm64.patch /var/src/
-ARG STEPS_VERSION=5.0.0_beta
+ARG STEPS_VERSION=5.0.1
 ARG STEPS_UT=false
 ARG STEPS_UT_KEEP_GOING=true
 ENV CTEST_OUTPUT_ON_FAILURE=1
@@ -116,12 +117,14 @@ RUN git clone --recursive \
  && mkdir build \
  && cd build \
  && cmake \
+      -DCMAKE_INSTALL_PREFIX=`python -c 'import sysconfig;print(sysconfig.get_path("platlib"))'` \
       -DTARGET_NATIVE_ARCH:BOOL="$STEPS_NATIVE_ARCH" \
       -DUSE_BUNDLE_SUNDIALS:BOOL=TRUE \
       -DUSE_BUNDLE_OMEGA_H:BOOL=FALSE \
       -DUSE_MPI:BOOL=ON \
       -DUSE_DISTRIBUTED_MESH:BOOL=TRUE \
-      -DPYTHON_LIBRARY:FILEPATH=/opt/conda/lib/libpython3.9.so \
+      -DPYTHON_LIBRARY:FILEPATH=/opt/conda/lib/libpython3.10.so \
+      -DCMAKE_VERBOSE_MAKEFILE=ON \
       .. \
  && make -j 4 all \
  && ([ "$STEPS_UT" = false ] || \
@@ -136,9 +139,6 @@ RUN git clone --recursive \
 RUN git clone https://github.com/CNS-OIST/STEPS_Example.git /var/src/STEPS_Example \
  && mv /var/src/STEPS_Example/user_manual/source /var/src/user_manual \
  && rm -rf /var/src/STEPS_Example
-
-RUN echo "/usr/lib/python3.8/config-3.8-x86_64-linux-gnu" >> /etc/ld.so.conf.d/python-lib.conf \
-  && ldconfig
 
 ARG EXAMPLE_NOTEBOOKS_TO_REBUILD="diffusion_boundary diffusion getting_started ip3 memb_pot sbml_importer surface_diffusion_boundary surface_diffusion well_mixed"
 # https://nbconvert.readthedocs.io/en/latest/usage.html#convert-notebook
