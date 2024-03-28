@@ -19,7 +19,7 @@ STEPS Python module.
 ```bash
 $ git clone https://github.com/CNS-OIST/STEPS_Docker
 $ cd STEPS_Docker
-$ echo "DUID=$(($(id -u)+1))\nDGID=$(id -g)\nHOST=$(hostname)" > .env
+$ echo -e "USER_ID=$(($(id -u)+1))\nGROUP_ID=$(id -g)\nHOST=$(hostname)" > .env
 $ docker-compose build
 $ docker-compose up
 Creating network "stepsdocker_default" with the default driver
@@ -64,7 +64,7 @@ By default, this repository use the latest stable of STEPS but you can choose to
 
 ```bash
 $ git checkout TAG
-$ echo "DUID=$(($(id -u)+1))\nDGID=$(id -g)\nHOST=$(hostname)" > .env
+$ echo -e "USER_ID=$(($(id -u)+1))\nGROUP_ID=$(id -g)\nHOST=$(hostname)" > .env
 $ docker-compose up lab
 ```
 
