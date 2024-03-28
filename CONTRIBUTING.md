@@ -79,7 +79,7 @@ updated to publish the corresponding Docker image.
 	 services:
 	   lab:
 	-    image: cnsoist/steps:3.1
-	+    image: cnsoist/steps:3.2
+	+    image: cnsoist/steps:5.0.1
 	     build: recipe
 	     hostname: $HOST
 	     ports:
@@ -105,7 +105,7 @@ updated to publish the corresponding Docker image.
     ``` {.bash}
     $ git checkout master
     $ git pull origin
-    $ git tag 3.2
+    $ git tag 5.0.1
     $ git push --tags
     ```
 
@@ -153,7 +153,7 @@ The following command will:
 docker buildx build --platform linux/amd64,linux/arm64 --build-arg STEPS_UT=false -t cnsoist/steps:latest --push recipe
 ```
 
-To create tag alias `5.0.0` on Docker Hub:
+To create tag alias `5.0.1` on Docker Hub:
 ```
-docker buildx imagetools create -t cnsoist/steps:5.0.0 cnsoist/steps:latest
+docker buildx imagetools create -t cnsoist/steps:5.0.1 cnsoist/steps:latest
 ```
