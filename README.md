@@ -19,7 +19,7 @@ STEPS Python module.
 ```bash
 $ git clone https://github.com/CNS-OIST/STEPS_Docker
 $ cd STEPS_Docker
-$ echo "DUID=$(($(id -u)+1))\nDGID=$(id -g)\nHOST=$(hostname)" > .env
+$ echo -e "USER_ID=$(id -u)\nGROUP_ID=$(id -g)\nHOST=$(hostname)" > .env
 $ docker-compose build
 $ docker-compose up
 Creating network "stepsdocker_default" with the default driver
@@ -64,7 +64,7 @@ By default, this repository use the latest stable of STEPS but you can choose to
 
 ```bash
 $ git checkout TAG
-$ echo "DUID=$(($(id -u)+1))\nDGID=$(id -g)\nHOST=$(hostname)" > .env
+$ echo -e "USER_ID=$(id -u)\nGROUP_ID=$(id -g)\nHOST=$(hostname)" > .env
 $ docker-compose up lab
 ```
 
@@ -105,7 +105,7 @@ you to import your notebooks. In this case, you can either:
 
 ## Windows support
 
-This Docker image can be run with _Docker Desktop for Windows_. Instructions in the *Getting Started* section above are a bit different though. Instead of executing command `echo "DUID=$(($(id -u)+1))\nDGID=$(id -g)\nHOST=$(hostname)" > .env`, update the `docker-compose.yaml` file as follow:
+This Docker image can be run with _Docker Desktop for Windows_. Instructions in the *Getting Started* section above are a bit different though. Instead of executing command `echo "DUID=$(id -u)\nDGID=$(id -g)\nHOST=$(hostname)" > .env`, update the `docker-compose.yaml` file as follow:
 
 * **hostname**: hardcode the machine name
 * **USER_LOGIN**: hardcode your user name
@@ -122,7 +122,7 @@ index 528e993..64dcca9 100644
 +++ b/docker-compose.yml
 @@ -3,15 +3,15 @@ services:
    lab:
-     image: cnsoist/steps:3.4
+     image: cnsoist/steps:5.0.1
      build: recipe
 -    hostname: $HOST
 +    hostname: my-windows10-machine

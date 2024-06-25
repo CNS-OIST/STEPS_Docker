@@ -1,15 +1,12 @@
 version: '2.2'
 services:
   lab:
-    image: cnsoist/steps:5.0.0_beta
+    image: cnsoist/steps:5.0.1
     build: recipe
     hostname: $HOST
     ports:
     - "8888:8888"
-    environment:
-    - USER_LOGIN=$USER
-    - USER_ID=$DUID
-    - GROUP_ID=$DGID
+    env_file: .env
     entrypoint: [/usr/bin/entrypoint]
     command:
     - jupyter
