@@ -50,18 +50,23 @@ RUN echo 'export PATH=/opt/conda/bin:$PATH' > /etc/profile.d/conda.sh \
  && wget --quiet https://repo.continuum.io/miniconda/Miniconda${MINICONDA_VERSION}-Linux-${minicondaArch}.sh -O ~/miniconda.sh \
  && /bin/bash ~/miniconda.sh -b -p /opt/conda \
  && rm ~/miniconda.sh \
- && /opt/conda/bin/pip install \
-    build \
-    cython \
-    jupyter \
-    jupyterlab \
-    matplotlib \
-    nose \
-    pip-tools \
-    python-libsbml \
-    scipy \
-&& /opt/conda/bin/conda install -c conda-forge "h5py[version='>=2.9',build=mpi*]" petsc petsc4py
-
+ && /opt/conda/bin/conda install -c conda-forge \
+   build \
+   "h5py[version='>=2.9',build=mpi*]" \
+   cython \
+   jupyter \
+   jupyterlab \
+   nose \
+   petsc \
+   petsc4py \
+   python-libsbml \
+   scipy \
+ && /opt/conda/bin/pip install matplotlib \
+ && /opt/conda/bin/conda install --solver=classic \
+   conda-forge::conda-libmamba-solver \
+   conda-forge::libarchive \
+   conda-forge::libmamba \
+   conda-forge::libmambapy
 ENV PATH "/opt/conda/bin:$PATH"
 ENV CMAKE_PREFIX_PATH=/opt/conda
 
