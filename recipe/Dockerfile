@@ -106,7 +106,7 @@ RUN if [ "x$BUILD_OMEGA_H" = xtrue ] ; then ( \
    ) fi
 
 ADD overlap-arm64.patch /var/src/
-ARG STEPS_VERSION=5.0.1
+ARG STEPS_VERSION=5.0.2
 ARG STEPS_UT=false
 ARG STEPS_UT_KEEP_GOING=true
 ENV CTEST_OUTPUT_ON_FAILURE=1
