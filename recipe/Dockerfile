@@ -30,6 +30,7 @@ RUN apt-get --yes -qq update \
                       libxft2 \
                       libxinerama1 \
                       pandoc \
+                      pkg-config \
                       vim       \
                       wget \
                       zlib1g-dev \
