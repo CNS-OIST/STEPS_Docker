@@ -24,13 +24,13 @@ RUN apt-get --yes -qq update \
                       libboost-dev \
                       libgl1 \
                       libglu1 \
-                      libgsl-dev \
                       libmetis-dev \
                       librdmacm-dev \
                       libxcursor1 \
                       libxft2 \
                       libxinerama1 \
                       pandoc \
+                      pkg-config \
                       vim       \
                       wget \
                       zlib1g-dev \
@@ -44,25 +44,30 @@ RUN dpkgArch="$(dpkg --print-architecture | awk -F- '{ print $NF }')" \
 # verify that the binary works
  && gosu nobody true
 
-ARG MINICONDA_VERSION=3-py312_24.1.2-0
+ARG MINICONDA_VERSION=3-py312_24.4.0-0
 RUN echo 'export PATH=/opt/conda/bin:$PATH' > /etc/profile.d/conda.sh \
  && dpkgArch="$(dpkg --print-architecture | awk -F- '{ print $NF }')" \
  && minicondaArch="$(case $dpkgArch in amd64) echo x86_64 ;; arm64) echo aarch64 ;; *) echo Unexpected arch: $dpkgArch; false ;; esac)" \
  && wget --quiet https://repo.continuum.io/miniconda/Miniconda${MINICONDA_VERSION}-Linux-${minicondaArch}.sh -O ~/miniconda.sh \
  && /bin/bash ~/miniconda.sh -b -p /opt/conda \
  && rm ~/miniconda.sh \
- && /opt/conda/bin/pip install \
-    build \
-    cython \
-    jupyter \
-    jupyterlab \
-    matplotlib \
-    nose \
-    pip-tools \
-    python-libsbml \
-    scipy \
-&& /opt/conda/bin/conda install -c conda-forge "h5py[version='>=2.9',build=mpi*]" petsc petsc4py
-
+ && /opt/conda/bin/conda install -c conda-forge \
+   build \
+   "h5py[version='>=2.9',build=mpi*]" \
+   cython \
+   jupyter \
+   jupyterlab \
+   nose \
+   petsc \
+   petsc4py \
+   python-libsbml \
+   scipy \
+ && /opt/conda/bin/pip install matplotlib \
+ && /opt/conda/bin/conda install --solver=classic \
+   conda-forge::conda-libmamba-solver \
+   conda-forge::libarchive \
+   conda-forge::libmamba \
+   conda-forge::libmambapy
 ENV PATH "/opt/conda/bin:$PATH"
 ENV CMAKE_PREFIX_PATH=/opt/conda
 
@@ -78,7 +83,7 @@ RUN wget https://gmsh.info/src/gmsh-${GMSH_VERSION}-source.tgz \
  && make -j 4 \
  && make install \
  && cd .. \
- && rm -rf gmsh-${GMSH_VERSION}-source
+ && rm -rf gmsh-${GMSH_VERSION}-source gmsh-${GMSH_VERSION}-source.tgz
 ENV PATH "/opt/gmsh-${GMSH_VERSION}/bin:$PATH"
 ENV CMAKE_PREFIX_PATH="/opt/gmsh-${GMSH_VERSION}:${CMAKE_PREFIX_PATH}"
 
@@ -123,7 +128,8 @@ RUN chmod +x /root \
       -DUSE_BUNDLE_SUNDIALS:BOOL=TRUE \
       -DUSE_BUNDLE_OMEGA_H:BOOL=FALSE \
       -DUSE_MPI:BOOL=ON \
-      -DUSE_DISTRIBUTED_MESH:BOOL=TRUE \
+      -DSTEPS_USE_DIST_MESH:BOOL=TRUE \
+      -DSTEPS_INSTALL_PYTHON_DEPS:BOOL=FALSE \
       .. \
  && make -j 4 all \
  && ([ "$STEPS_UT" = false ] || \
