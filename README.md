@@ -20,33 +20,21 @@ STEPS Python module.
 $ git clone https://github.com/CNS-OIST/STEPS_Docker
 $ cd STEPS_Docker
 $ echo -e "USER_ID=$(id -u)\nGROUP_ID=$(id -g)\nHOST=$(hostname)" > .env
-$ docker-compose build
-$ docker-compose up
-Creating network "stepsdocker_default" with the default driver
-Creating stepsdocker_lab_1 ...
-Creating stepsdocker_lab_1 ... done
-Attaching to stepsdocker_lab_1
-lab_1       | [I 11:11:08.510 LabApp] Writing notebook server cookie secret to /home/dummy/.local/share/jupyter/runtime/notebook_cookie_secret
-lab_1       | [W 11:11:08.526 LabApp] JupyterLab server extension not enabled, manually loading...
-lab_1       | [I 11:11:08.526 LabApp] JupyterLab alpha preview extension loaded from /opt/conda/lib/python2.7/site-packages/jupyterlab
-lab_1       | JupyterLab v0.27.0
-lab_1       | Known labextensions:
-lab_1       | [I 11:11:08.527 LabApp] Running the core application with no additional extensions or settings
-lab_1       | [I 11:11:08.528 LabApp] Serving notebooks from local directory: /opt/src/notebooks
-lab_1       | [I 11:11:08.528 LabApp] 0 active kernels
-lab_1       | [I 11:11:08.528 LabApp] The Jupyter Notebook is running at:
-lab_1       | [I 11:11:08.528 LabApp] http://0.0.0.0:8888/?token=1ad5c8449f01f463bb9f716663e14f38cc133517c097ff9b
-lab_1       | [I 11:11:08.528 LabApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
-lab_1       | [C 11:11:08.529 LabApp]
-lab_1       |
-lab_1       |     Copy/paste this URL into your browser when you connect for the first time,
-lab_1       |     to login with a token:
-lab_1       |         http://0.0.0.0:8888/?token=1ad5c8449f01f463bb9f716663e14f38cc133517c097ff9b
-
+$ docker compose build
+$ docker compose up
+[+] Running 2/2
+ Network steps_docker_default  Created
+ Container steps_docker-lab-1  Started
+Attaching to lab-1
+lab-1  | [I 2026-08-28 13:04:26.522 LabApp] JupyterLab extension loaded from /opt/conda/lib/python3.12/site-packages/jupyterlab
+lab-1  | [I 2026-08-28 13:04:26.529 ServerApp] Serving notebooks from local directory: /opt/src/notebooks
+lab-1  | [I 2026-08-28 13:04:26.529 ServerApp] Jupyter Server 2.14.2 is running at:
+lab-1  | [I 2026-08-28 13:04:26.529 ServerApp]     http://127.0.0.1:8888/lab?token=33945ebd2acf1416c971e1c7b919c32a87915f025930852d
+lab-1  | [I 2026-08-28 13:04:26.529 ServerApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
 ```
 
 Then open your web browser at the provided HTTP address. In this case
-http://0.0.0.0:8888/?token=1ad5c8449f01f463bb9f716663e14f38cc133517c097ff9b
+http://127.0.0.1:8888/lab?token=33945ebd2acf1416c971e1c7b919c32a87915f025930852d
 
 ## Files management
 
@@ -65,7 +53,7 @@ By default, this repository use the latest stable of STEPS but you can choose to
 ```bash
 $ git checkout TAG
 $ echo -e "USER_ID=$(id -u)\nGROUP_ID=$(id -g)\nHOST=$(hostname)" > .env
-$ docker-compose up lab
+$ docker compose up lab
 ```
 
 ### Execute custom command in the container
@@ -73,7 +61,7 @@ $ docker-compose up lab
 To execute a custom command in the container, you can use the command below:
 
 ```bash
-$ docker-compose run steps COMMAND
+$ docker compose run lab COMMAND
 ```
 
 `COMMAND` can be anything like `bash` or `ipython`.
@@ -97,10 +85,11 @@ you to import your notebooks. In this case, you can either:
     ```bash
     <YOUR_NOTEBOOK.ipynb python -m json.tool
     ```
-* Use the `notebook` container provided in the `docker-compose.yml` file:
+* Run the classic Notebook interface from the `lab` service:
 
     ```bash
-    docker-compose up notebook
+    docker compose run --service-ports lab jupyter notebook \
+        --no-browser --allow-root --ip=0.0.0.0 --notebook-dir=/opt/src/notebooks
     ```
 
 ## Windows support
@@ -122,7 +111,7 @@ index 528e993..64dcca9 100644
 +++ b/docker-compose.yml
 @@ -3,15 +3,15 @@ services:
    lab:
-     image: cnsoist/steps:5.0.1
+     image: cnsoist/steps:5.1.0
      build: recipe
 -    hostname: $HOST
 +    hostname: my-windows10-machine
@@ -143,7 +132,7 @@ index 528e993..64dcca9 100644
      command:
 ```
 
-Before running `docker-compose build`, it is imperative to open `./recipe/entrypoint` with Visual Code (or your favourite text editor), and change the **End of Line Sequence** from `CRLF` to `LF`.
+Before running `docker compose build`, it is imperative to open `./recipe/entrypoint` with Visual Code (or your favourite text editor), and change the **End of Line Sequence** from `CRLF` to `LF`.
 
 From:
 ![image](images/crlf.png)

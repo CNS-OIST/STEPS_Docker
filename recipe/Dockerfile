@@ -1,4 +1,4 @@
-FROM ubuntu:23.04
+FROM ubuntu:24.04
 MAINTAINER Tristan CAREL <tristan.carel@epfl.ch>
 
 ARG DEBIAN_FRONTEND=noninteractive
@@ -51,19 +51,19 @@ RUN echo 'export PATH=/opt/conda/bin:$PATH' > /etc/profile.d/conda.sh \
  && wget --quiet https://repo.continuum.io/miniconda/Miniconda${MINICONDA_VERSION}-Linux-${minicondaArch}.sh -O ~/miniconda.sh \
  && /bin/bash ~/miniconda.sh -b -p /opt/conda \
  && rm ~/miniconda.sh \
- && /opt/conda/bin/conda install -c conda-forge \
-   build \
+ && /opt/conda/bin/conda install --override-channels -c conda-forge \
+   python-build \
    "h5py[version='>=2.9',build=mpi*]" \
    cython \
+   "numpy>=2.3.5" \
    jupyter \
    jupyterlab \
-   nose \
    petsc \
    petsc4py \
    python-libsbml \
    scipy \
  && /opt/conda/bin/pip install matplotlib \
- && /opt/conda/bin/conda install --solver=classic \
+ && /opt/conda/bin/conda install --solver=classic --override-channels -c conda-forge \
    conda-forge::conda-libmamba-solver \
    conda-forge::libarchive \
    conda-forge::libmamba \
@@ -105,8 +105,7 @@ RUN if [ "x$BUILD_OMEGA_H" = xtrue ] ; then ( \
 && rm -rf /var/src/omega_h \
    ) fi
 
-ADD overlap-arm64.patch /var/src/
-ARG STEPS_VERSION=5.0.2
+ARG STEPS_VERSION=5.1.0
 ARG STEPS_UT=false
 ARG STEPS_UT_KEEP_GOING=true
 ENV CTEST_OUTPUT_ON_FAILURE=1
@@ -119,7 +118,6 @@ RUN chmod +x /root \
  && cd /var/src/STEPS \
  && git checkout "$STEPS_VERSION" \
  && git submodule update --init --recursive \
- && patch -p1 < /var/src/overlap-arm64.patch \
  && mkdir build \
  && cd build \
  && python -c "import os,sysconfig; os.makedirs(sysconfig.get_path('platlib', f'{os.name}_user'), exist_ok=True)" \
