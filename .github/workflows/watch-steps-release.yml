@@ -1,0 +1,96 @@
+# Opens a pull request when a new STEPS release appears.
+#
+# The image fell three releases behind because publishing depended on someone
+# noticing that STEPS had been released. This watches instead, and drafts the
+# two-line bump. publish.yml then builds and smoke-tests both architectures on
+# the pull request, so shipping a release becomes review, merge, tag.
+#
+# Set a WATCHER_TOKEN secret (a fine-grained PAT for this repository with
+# contents and pull-requests write). Pull requests opened with the default
+# GITHUB_TOKEN deliberately do not trigger other workflows, so without it the
+# bump arrives without having been built - see the note in the body below.
+#
+# Also needs Settings -> Actions -> "Allow GitHub Actions to create and approve
+# pull requests".
+name: Watch for new STEPS release
+
+on:
+  schedule:
+    - cron: '0 6 * * 1' # Mondays; STEPS releases a few times a year
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.WATCHER_TOKEN || github.token }}
+
+      - name: Compare the latest STEPS release with the pinned version
+        id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          latest=$(gh api repos/CNS-OIST/STEPS/releases/latest --jq .tag_name)
+          current=$(sed -n 's/^ARG STEPS_VERSION=//p' recipe/Dockerfile)
+          echo "latest release: $latest, recipe pins: $current"
+          echo "latest=$latest" >> "$GITHUB_OUTPUT"
+          echo "outdated=$([ "$latest" = "$current" ] && echo false || echo true)" >> "$GITHUB_OUTPUT"
+          echo "current=$current" >> "$GITHUB_OUTPUT"
+
+      - name: Open a pull request bumping the version
+        if: steps.check.outputs.outdated == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.WATCHER_TOKEN || github.token }}
+          LATEST: ${{ steps.check.outputs.latest }}
+          CURRENT: ${{ steps.check.outputs.current }}
+        run: |
+          set -euo pipefail
+          branch="bump-steps-$LATEST"
+
+          # Reopening the same pull request every Monday would be noise.
+          if [ "$(gh pr list --head "$branch" --state open --json number --jq 'length')" != "0" ]; then
+            echo "A pull request for $LATEST is already open."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$branch"
+          sed -i "s|^ARG STEPS_VERSION=.*|ARG STEPS_VERSION=$LATEST|" recipe/Dockerfile
+          sed -i "s|image: cnsoist/steps:.*|image: cnsoist/steps:$LATEST|" docker-compose.yml
+          git diff --exit-code && { echo "Nothing changed; the pins may not match the expected format."; exit 1; }
+          git commit -am "Build STEPS $LATEST"
+          git push -u origin "$branch"
+
+          cat > /tmp/body.md <<EOF
+          STEPS [$LATEST](https://github.com/CNS-OIST/STEPS/releases/tag/$LATEST) has
+          been released. This bumps \`STEPS_VERSION\` and the \`docker-compose.yml\`
+          image tag from $CURRENT.
+
+          \`publish.yml\` builds and smoke-tests both architectures on this pull
+          request. Once it is green and merged, publish by pushing the tag:
+
+          \`\`\`
+          git checkout master && git pull origin
+          git tag $LATEST && git push --tags
+          \`\`\`
+
+          Check the release notes for anything the recipe needs beyond the version:
+          a new system dependency, a changed build option, or a Python version
+          constraint.
+
+          If no checks appear below, this was opened with the default token, which
+          cannot trigger workflows. Close and reopen the pull request to start CI.
+
+          Opened automatically by \`watch-steps-release.yml\`.
+          EOF
+
+          gh pr create --base master --head "$branch" \
+            --title "Build STEPS $LATEST" --body-file /tmp/body.md
