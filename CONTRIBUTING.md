@@ -61,56 +61,33 @@ updated to publish the corresponding Docker image.
 
 1.  Update the `STEPS_VERSION` argument in the `recipe/Dockerfile` file
     so that the Docker image now fetches the latest version of STEPS.
-1.  Bump the `image` tag to upload in the `docker-compose.yml` to match
-    the new STEPS version.
-1.  Build the Docker image on your machine: `docker-compose build`
-1.  Start the JupyterLab container and ensures that notebooks are
-    working well
-1.  Create a pull-request containing those 2 changes. Typically it should
-    provide a diff like below:
-
-	```diff
-	diff --git a/docker-compose.yml b/docker-compose.yml
-	index 3659fe6..e757d61 100644
-	--- a/docker-compose.yml
-	+++ b/docker-compose.yml
-	@@ -1,7 +1,7 @@
-	 version: '2.2'
-	 services:
-	   lab:
-	-    image: cnsoist/steps:3.1
-	+    image: cnsoist/steps:5.0.1
-	     build: recipe
-	     hostname: $HOST
-	     ports:
-	diff --git a/recipe/Dockerfile b/recipe/Dockerfile
-	index e188691..c7a5ad7 100644
-	--- a/recipe/Dockerfile
-	+++ b/recipe/Dockerfile
-	@@ -69,7 +69,7 @@ RUN if [ "x$BUILD_PETSC" = xtrue ] ; then ( \
-	  && ldconfig \
-	  ) fi
-	 
-	-ARG STEPS_VERSION=5fe7b245554ab5b23798323f7c8d819a94069c63
-	+ARG STEPS_VERSION=3.2
-	 RUN git clone --recursive https://github.com/CNS-OIST/STEPS.git /var/src/STEPS \
-	  && cd /var/src/STEPS \
-	  && git checkout "$STEPS_VERSION" \
-	```
-
-1.  When the pull-request has been reviewed and merged on the master
-    branch, create a tag after the STEPS version, and push it. For
-    instance:
+1.  Bump the `image` tag in `docker-compose.yml` to match the new STEPS
+    version.
+1.  Open a pull request with those two changes. To rehearse the build
+    before merging, run the *Publish Docker image* workflow manually
+    (Actions tab → Run workflow) with the new STEPS version: it defaults
+    to pushing nothing, and to `cnsoist/steps-testing` if you do enable
+    the push.
+1.  Once the pull request is merged, create a tag named after the STEPS
+    version and push it:
 
     ``` {.bash}
     $ git checkout master
     $ git pull origin
-    $ git tag 5.0.1
+    $ git tag 5.1.0
     $ git push --tags
     ```
 
-    DockerHub will be notified by GitHub when the tag is pushed, and will
-    trigger the build of the new Docker image.
+    The `.github/workflows/publish.yml` workflow then builds `linux/amd64`
+    and `linux/arm64` on native runners, smoke-tests each one, and pushes
+    a multi-architecture `cnsoist/steps:<version>` and `cnsoist/steps:latest`.
+
+    This requires two repository secrets, `DOCKERHUB_USERNAME` and
+    `DOCKERHUB_TOKEN`, holding a Docker Hub access token with write
+    access to the `cnsoist` namespace.
+
+The section below documents how to do the same by hand, which is what the
+release process relied on before the workflow existed.
 
 ## How to release multi-platform Docker images?
 
