@@ -2,7 +2,7 @@ services:
   lab:
     image: cnsoist/steps:5.1.0
     build: recipe
-    hostname: $HOST
+    hostname: ${HOST:-steps}
     ports:
     - "8888:8888"
     env_file: .env
@@ -15,5 +15,5 @@ services:
     - --ip=0.0.0.0
     - --notebook-dir=/opt/src/notebooks
     volumes:
-    - $PWD/notebooks:/opt/src/notebooks
+    - ./notebooks:/opt/src/notebooks
     scale: 1
