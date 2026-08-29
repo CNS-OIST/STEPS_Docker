@@ -15,8 +15,16 @@
 name: Watch for new STEPS release
 
 on:
+  # CNS-OIST/STEPS sends this the moment a release is published, which is the
+  # trigger that matters. The schedule below is only a backstop.
+  repository_dispatch:
+    types: [steps-release]
   schedule:
-    - cron: '0 6 * * 1' # Mondays; STEPS releases a few times a year
+    # GitHub disables scheduled workflows after 60 days without repository
+    # activity, and every gap between STEPS releases so far has been longer than
+    # that (102, 136, 183, 321 days). So this will switch itself off between
+    # releases; it is the dispatch above that is relied on.
+    - cron: '0 6 * * 1'
   workflow_dispatch:
 
 permissions:
