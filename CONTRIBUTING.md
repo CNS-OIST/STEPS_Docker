@@ -56,35 +56,41 @@ maintainers.
 
 ### How to release a new Docker image?
 
-Whenever a new version of STEPS is released, this repository may be
-updated to publish the corresponding Docker image.
+Nothing needs doing. When `CNS-OIST/STEPS` publishes a release it sends a
+`repository_dispatch` to this repository, and
+`.github/workflows/watch-steps-release.yml` bumps `STEPS_VERSION` in
+`recipe/Dockerfile` and the `image` tag in `docker-compose.yml` on `master`,
+then pushes a tag named after the STEPS version.
 
-1.  Update the `STEPS_VERSION` argument in the `recipe/Dockerfile` file
-    so that the Docker image now fetches the latest version of STEPS.
-1.  Bump the `image` tag in `docker-compose.yml` to match the new STEPS
-    version.
-1.  Open a pull request with those two changes. To rehearse the build
-    before merging, run the *Publish Docker image* workflow manually
-    (Actions tab → Run workflow) with the new STEPS version: it defaults
-    to pushing nothing, and to `cnsoist/steps-testing` if you do enable
-    the push.
-1.  Once the pull request is merged, create a tag named after the STEPS
-    version and push it:
+That tag starts `.github/workflows/publish.yml`, which builds `linux/amd64` and
+`linux/arm64` on native runners, smoke-tests each one, and pushes a
+multi-architecture `cnsoist/steps:<version>` and `cnsoist/steps:latest` only if
+both pass. A release needing more than a version bump - a new system
+dependency, a changed build option, a Python constraint - fails the build and
+publishes nothing, which is the signal to fix the recipe.
 
-    ``` {.bash}
-    $ git checkout master
-    $ git pull origin
-    $ git tag 5.1.0
-    $ git push --tags
-    ```
+The image fell three releases behind (5.0.3, 5.0.4, 5.1.0) when this was a
+manual step, which is why it is not one any more.
 
-    The `.github/workflows/publish.yml` workflow then builds `linux/amd64`
-    and `linux/arm64` on native runners, smoke-tests each one, and pushes
-    a multi-architecture `cnsoist/steps:<version>` and `cnsoist/steps:latest`.
+#### If a release is missed
 
-    This requires two repository secrets, `DOCKERHUB_USERNAME` and
-    `DOCKERHUB_TOKEN`, holding a Docker Hub access token with write
-    access to the `cnsoist` namespace.
+Run *Publish the image for a new STEPS release* from the Actions tab. Leave the
+version blank to pick up whatever `CNS-OIST/STEPS` reports as its latest
+release, or name one explicitly. It does nothing if the recipe already pins that
+version or the tag already exists.
+
+#### To rehearse a build
+
+Run *Publish Docker image* manually with the STEPS version you want. It defaults
+to pushing nothing, and to `cnsoist/steps-testing` if you do enable the push.
+
+#### Secrets this depends on
+
+- `WATCHER_TOKEN` - a fine-grained PAT for this repository with contents write.
+  Required: a tag pushed with the default `GITHUB_TOKEN` does not start another
+  workflow, so `publish.yml` would never run.
+- `DOCKERHUB_USERNAME` and `DOCKERHUB_TOKEN` - a Docker Hub access token with
+  write access to the `cnsoist` namespace.
 
 The section below documents how to do the same by hand, which is what the
 release process relied on before the workflow existed.

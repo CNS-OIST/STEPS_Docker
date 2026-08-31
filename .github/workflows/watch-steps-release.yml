@@ -1,104 +1,110 @@
-# Opens a pull request when a new STEPS release appears.
+# Publishes the image for a new STEPS release, without anyone having to notice.
 #
 # The image fell three releases behind because publishing depended on someone
-# noticing that STEPS had been released. This watches instead, and drafts the
-# two-line bump. publish.yml then builds and smoke-tests both architectures on
-# the pull request, so shipping a release becomes review, merge, tag.
+# spotting that STEPS had been released. CNS-OIST/STEPS now sends a
+# repository_dispatch the moment it publishes a release; this bumps the pinned
+# version on master and pushes the tag, and publish.yml builds, smoke-tests and
+# pushes both architectures from there.
 #
-# Set a WATCHER_TOKEN secret (a fine-grained PAT for this repository with
-# contents and pull-requests write). Pull requests opened with the default
-# GITHUB_TOKEN deliberately do not trigger other workflows, so without it the
-# bump arrives without having been built - see the note in the body below.
+# There is no schedule as a backstop. GitHub disables scheduled workflows after
+# 60 days without repository activity, and every gap between STEPS releases so
+# far has been longer than that (102, 136, 183, 321 days), so a schedule would
+# switch itself off before it ever fired. Run this by hand if a dispatch is
+# missed.
 #
-# Also needs Settings -> Actions -> "Allow GitHub Actions to create and approve
-# pull requests".
-name: Watch for new STEPS release
+# WATCHER_TOKEN is required, not optional: a fine-grained PAT for this
+# repository with contents write. A tag pushed with the default GITHUB_TOKEN
+# does not start another workflow run, so publish.yml would never fire and the
+# image would silently not be published - the exact failure this exists to end.
+name: Publish the image for a new STEPS release
 
 on:
-  # CNS-OIST/STEPS sends this the moment a release is published, which is the
-  # trigger that matters. The schedule below is only a backstop.
   repository_dispatch:
     types: [steps-release]
-  schedule:
-    # GitHub disables scheduled workflows after 60 days without repository
-    # activity, and every gap between STEPS releases so far has been longer than
-    # that (102, 136, 183, 321 days). So this will switch itself off between
-    # releases; it is the dispatch above that is relied on.
-    - cron: '0 6 * * 1'
   workflow_dispatch:
+    inputs:
+      version:
+        description: STEPS release to build (defaults to the latest release)
+        required: false
 
 permissions:
   contents: write
-  pull-requests: write
 
 jobs:
-  check:
+  release:
     runs-on: ubuntu-24.04
     steps:
+      - name: Check the token is present
+        # Without it the run would look successful while publishing nothing.
+        env:
+          WATCHER_TOKEN: ${{ secrets.WATCHER_TOKEN }}
+        run: |
+          if [ -z "${WATCHER_TOKEN:-}" ]; then
+            echo "WATCHER_TOKEN is not set. A tag pushed with GITHUB_TOKEN does" >&2
+            echo "not trigger publish.yml, so this would publish nothing." >&2
+            exit 1
+          fi
+
       - uses: actions/checkout@v4
         with:
-          token: ${{ secrets.WATCHER_TOKEN || github.token }}
+          token: ${{ secrets.WATCHER_TOKEN }}
 
-      - name: Compare the latest STEPS release with the pinned version
+      - name: Work out which version to build
         id: check
         env:
           GH_TOKEN: ${{ github.token }}
+          # The dispatch carries the version, so this is right even if the
+          # release is not yet the one `releases/latest` reports.
+          DISPATCHED: ${{ github.event.client_payload.version }}
+          REQUESTED: ${{ inputs.version }}
         run: |
           set -euo pipefail
-          latest=$(gh api repos/CNS-OIST/STEPS/releases/latest --jq .tag_name)
+          latest="${DISPATCHED:-${REQUESTED:-}}"
+          if [ -z "$latest" ]; then
+            latest=$(gh api repos/CNS-OIST/STEPS/releases/latest --jq .tag_name)
+          fi
+
+          # publish.yml only triggers on tags matching this shape, so anything
+          # else - a prerelease, a `v` prefix - would push a tag that publishes
+          # nothing. Fail loudly instead.
+          if ! printf '%s' "$latest" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "Version '$latest' is not MAJOR.MINOR.PATCH; publish.yml would not fire." >&2
+            exit 1
+          fi
+
           current=$(sed -n 's/^ARG STEPS_VERSION=//p' recipe/Dockerfile)
           echo "latest release: $latest, recipe pins: $current"
           echo "latest=$latest" >> "$GITHUB_OUTPUT"
           echo "outdated=$([ "$latest" = "$current" ] && echo false || echo true)" >> "$GITHUB_OUTPUT"
-          echo "current=$current" >> "$GITHUB_OUTPUT"
 
-      - name: Open a pull request bumping the version
+      - name: Bump the pinned version and tag it
         if: steps.check.outputs.outdated == 'true'
         env:
-          GH_TOKEN: ${{ secrets.WATCHER_TOKEN || github.token }}
           LATEST: ${{ steps.check.outputs.latest }}
-          CURRENT: ${{ steps.check.outputs.current }}
         run: |
           set -euo pipefail
-          branch="bump-steps-$LATEST"
 
-          # Reopening the same pull request every Monday would be noise.
-          if [ "$(gh pr list --head "$branch" --state open --json number --jq 'length')" != "0" ]; then
-            echo "A pull request for $LATEST is already open."
+          # A repeated dispatch for a release already published should do
+          # nothing rather than fail.
+          if git ls-remote --exit-code --tags origin "refs/tags/$LATEST" >/dev/null 2>&1; then
+            echo "Tag $LATEST already exists; nothing to do."
             exit 0
           fi
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git checkout -b "$branch"
           sed -i "s|^ARG STEPS_VERSION=.*|ARG STEPS_VERSION=$LATEST|" recipe/Dockerfile
           sed -i "s|image: cnsoist/steps:.*|image: cnsoist/steps:$LATEST|" docker-compose.yml
-          git diff --exit-code && { echo "Nothing changed; the pins may not match the expected format."; exit 1; }
+
+          # An unchanged tree means the pins no longer match the expected shape,
+          # which would otherwise tag a build of the wrong version.
+          git diff --exit-code && { echo "Nothing changed; check the pin format in recipe/Dockerfile." >&2; exit 1; }
+
           git commit -am "Build STEPS $LATEST"
-          git push -u origin "$branch"
+          git push origin HEAD:master
 
-          cat > /tmp/body.md <<EOF
-          STEPS [$LATEST](https://github.com/CNS-OIST/STEPS/releases/tag/$LATEST) has
-          been released. This bumps \`STEPS_VERSION\` and the \`docker-compose.yml\`
-          image tag from $CURRENT.
-
-          \`publish.yml\` builds and smoke-tests both architectures on this pull
-          request. Once it is green and merged, publish by pushing the tag:
-
-          \`\`\`
-          git checkout master && git pull origin
-          git tag $LATEST && git push --tags
-          \`\`\`
-
-          Check the release notes for anything the recipe needs beyond the version:
-          a new system dependency, a changed build option, or a Python version
-          constraint.
-
-          If no checks appear below, this was opened with the default token, which
-          cannot trigger workflows. Close and reopen the pull request to start CI.
-
-          Opened automatically by \`watch-steps-release.yml\`.
-          EOF
-
-          gh pr create --base master --head "$branch" \
-            --title "Build STEPS $LATEST" --body-file /tmp/body.md
+          # publish.yml takes over here: it builds linux/amd64 and linux/arm64
+          # on native runners, smoke-tests each, and pushes only if both pass.
+          git tag "$LATEST"
+          git push origin "$LATEST"
+          echo "Tagged $LATEST; publish.yml will build and push the image."
